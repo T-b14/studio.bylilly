@@ -347,52 +347,48 @@ app.get('/api/ai-digest', async (req, res) => {
   }
 
   try {
-    // Fetch from two angles: recent AI stories + top AI stories
-    const [recentRes, topRes] = await Promise.all([
-      fetch('https://hn.algolia.com/api/v1/search_by_date?query=AI+LLM+GPT+Claude+Gemini+machine+learning+model&tags=story&hitsPerPage=30'),
-      fetch('https://hn.algolia.com/api/v1/search?query=artificial+intelligence+AI+agent+model+release&tags=story&hitsPerPage=20')
+    // Fetch top AI stories by popularity (points) — the stuff actually getting traffic
+    const [hotRes, newRes] = await Promise.all([
+      fetch('https://hn.algolia.com/api/v1/search?query=AI+LLM+model+release+agent+Anthropic+OpenAI+Google+Mistral&tags=story&hitsPerPage=30&numericFilters=points>30'),
+      fetch('https://hn.algolia.com/api/v1/search_by_date?query=AI+model+release+Claude+GPT+Gemini+Llama+agent&tags=story&hitsPerPage=20&numericFilters=points>20')
     ]);
-    const [recentData, topData] = await Promise.all([recentRes.json(), topRes.json()]);
+    const [hotData, newData] = await Promise.all([hotRes.json(), newRes.json()]);
 
-    // Merge + dedupe by URL
+    // Merge + dedupe, sort by points descending
     const seen = new Set();
-    const allStories = [...(recentData.hits || []), ...(topData.hits || [])]
+    const allStories = [...(hotData.hits || []), ...(newData.hits || [])]
       .filter(h => h.url && h.title && !seen.has(h.url) && seen.add(h.url))
-      .slice(0, 30);
+      .sort((a, b) => (b.points || 0) - (a.points || 0))
+      .slice(0, 25);
 
     if (!allStories.length) {
-      const empty = { articles: [], overview: 'No AI news found in the last 24 hours.' };
+      const empty = { articles: [], overview: 'No major AI news today.' };
       db.saveDigest(today, [], empty.overview);
       return res.json(empty);
     }
 
-    const storiesList = allStories.map((s, i) => `${i + 1}. ${s.title} — ${s.url}`).join('\n');
+    const storiesList = allStories.map((s, i) =>
+      `${i + 1}. [${s.points || 0} pts] ${s.title} — ${s.url}`
+    ).join('\n');
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
       messages: [
         {
           role: 'system',
-          content: `You are an AI news curator for Tanner Brock, a 20-year-old sophomore at the University of Kansas studying business analytics and supply chain management. He wants to stay ahead of AI before it goes mainstream — understanding what's coming and what skills he needs to develop.
+          content: `You are an elite AI news editor for Tanner Brock, a 20-year-old studying business analytics and supply chain at the University of Kansas. He wants to be ahead of AI before everyone else catches up — knowing what's coming, what to learn, and what will matter for his career.
 
-PRIORITIZE stories about:
-- New AI model releases (GPT-5, Claude 4, Gemini updates, Llama, etc.) — these are always top priority
-- AI agents doing real-world business tasks
-- AI tools for data analysts, business intelligence, and productivity
-- AI in logistics, supply chain, demand forecasting, operations
-- Skills/tools college students and early-career people need to learn NOW
-- AI replacing or augmenting white-collar knowledge work
-- Practical "learn this before everyone else does" type developments
+ONLY cover stories that are genuinely significant. Think: new model launches, major capability breakthroughs, AI tools that are changing how businesses operate, AI agents replacing real jobs, things that will reshape industries in the next 1-3 years. Skip anything that isn't clearly important.
 
-DEPRIORITIZE: pure academic papers with no practical angle, niche hardware, crypto/blockchain AI, AI image generation drama, funding announcements with no product news.`
+Write with authority and directness. No filler. Tell him what's happening, why it matters, and specifically what he should do or learn because of it.`
         },
         {
           role: 'user',
-          content: `Here are today's AI stories from Hacker News:\n\n${storiesList}\n\nPick the 5 most important stories for Tanner. For each, write a detailed 3-4 sentence summary explaining: what it is, why it's a big deal, and what it means for someone trying to get ahead in business analytics and supply chain. Also write a detailed 4-5 sentence overview of today's AI landscape — what's the big picture, what should Tanner pay attention to, and what does he need to start learning or doing based on what's happening today.\n\nReturn ONLY this JSON (no explanation):\n{\n  "articles": [\n    { "title": "...", "url": "...", "summary": "3-4 sentences: what it is, why it matters, what Tanner should take away" }\n  ],\n  "overview": "4-5 sentence big picture analysis of today in AI, with specific callouts for what Tanner should be learning or paying attention to"\n}`
+          content: `Here are today's most-upvoted AI stories on Hacker News (sorted by points):\n\n${storiesList}\n\nPick the 3-5 most genuinely important stories. Skip anything minor or niche.\n\nFor each article, write 3-4 sentences: what it is, why it's a big deal right now, and what Tanner should take away.\n\nFor the overview, write 2-3 full paragraphs covering: (1) what's the biggest thing happening in AI today and why it matters, (2) how it connects to business analytics and supply chain specifically, (3) what Tanner should be learning or doing right now to stay ahead.\n\nReturn ONLY this JSON:\n{\n  "articles": [\n    { "title": "...", "url": "...", "summary": "3-4 sentences" }\n  ],\n  "overview": "2-3 full paragraphs separated by \\n\\n"\n}`
         }
       ],
-      temperature: 0.4,
-      max_tokens: 1500
+      temperature: 0.3,
+      max_tokens: 2000
     });
 
     const text = completion.choices[0].message.content;

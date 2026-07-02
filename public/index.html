@@ -1323,7 +1323,8 @@ function renderDigest(data) {
   const overview = document.getElementById('digest-overview');
   const articles = document.getElementById('digest-articles');
 
-  overview.textContent = data.overview || 'No summary available.';
+  const overviewText = data.overview || 'No summary available.';
+  overview.innerHTML = overviewText.split('\n\n').map(p => `<p style="margin-bottom:10px">${p}</p>`).join('');
 
   if (data.articles && data.articles.length) {
     articles.innerHTML = data.articles.map(a => `
