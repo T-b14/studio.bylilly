@@ -347,34 +347,52 @@ app.get('/api/ai-digest', async (req, res) => {
   }
 
   try {
-    const hnRes = await fetch(
-      'https://hn.algolia.com/api/v1/search_by_date?query=AI+LLM+machine+learning&tags=story&hitsPerPage=30'
-    );
-    const hnData = await hnRes.json();
-    const stories = (hnData.hits || []).filter(h => h.url && h.title).slice(0, 20);
+    // Fetch from two angles: recent AI stories + top AI stories
+    const [recentRes, topRes] = await Promise.all([
+      fetch('https://hn.algolia.com/api/v1/search_by_date?query=AI+LLM+GPT+Claude+Gemini+machine+learning+model&tags=story&hitsPerPage=30'),
+      fetch('https://hn.algolia.com/api/v1/search?query=artificial+intelligence+AI+agent+model+release&tags=story&hitsPerPage=20')
+    ]);
+    const [recentData, topData] = await Promise.all([recentRes.json(), topRes.json()]);
 
-    if (!stories.length) {
+    // Merge + dedupe by URL
+    const seen = new Set();
+    const allStories = [...(recentData.hits || []), ...(topData.hits || [])]
+      .filter(h => h.url && h.title && !seen.has(h.url) && seen.add(h.url))
+      .slice(0, 30);
+
+    if (!allStories.length) {
       const empty = { articles: [], overview: 'No AI news found in the last 24 hours.' };
       db.saveDigest(today, [], empty.overview);
       return res.json(empty);
     }
 
-    const storiesList = stories.map((s, i) => `${i + 1}. ${s.title} — ${s.url}`).join('\n');
+    const storiesList = allStories.map((s, i) => `${i + 1}. ${s.title} — ${s.url}`).join('\n');
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
       messages: [
         {
           role: 'system',
-          content: `You are an AI news curator for Tanner Brock, a sophomore at the University of Kansas studying business analytics and supply chain management. He's building side projects and chasing a 2027 internship. Prioritize AI stories about: data analytics tools, supply chain automation, LLMs in business, AI for analysts, practical enterprise AI, AI agents, and new model releases. Deprioritize: pure academic research papers, niche hardware specs, crypto+AI, AI art drama.`
+          content: `You are an AI news curator for Tanner Brock, a 20-year-old sophomore at the University of Kansas studying business analytics and supply chain management. He wants to stay ahead of AI before it goes mainstream — understanding what's coming and what skills he needs to develop.
+
+PRIORITIZE stories about:
+- New AI model releases (GPT-5, Claude 4, Gemini updates, Llama, etc.) — these are always top priority
+- AI agents doing real-world business tasks
+- AI tools for data analysts, business intelligence, and productivity
+- AI in logistics, supply chain, demand forecasting, operations
+- Skills/tools college students and early-career people need to learn NOW
+- AI replacing or augmenting white-collar knowledge work
+- Practical "learn this before everyone else does" type developments
+
+DEPRIORITIZE: pure academic papers with no practical angle, niche hardware, crypto/blockchain AI, AI image generation drama, funding announcements with no product news.`
         },
         {
           role: 'user',
-          content: `Here are today's top AI stories from Hacker News:\n\n${storiesList}\n\nPick the 3 most relevant and interesting for Tanner. Return ONLY this JSON (no explanation):\n{\n  "articles": [\n    { "title": "...", "url": "...", "summary": "1-2 sentences: what it is and why it matters to someone in business analytics/supply chain" }\n  ],\n  "overview": "2-3 sentence plain-English summary of what's happening in AI today"\n}`
+          content: `Here are today's AI stories from Hacker News:\n\n${storiesList}\n\nPick the 5 most important stories for Tanner. For each, write a detailed 3-4 sentence summary explaining: what it is, why it's a big deal, and what it means for someone trying to get ahead in business analytics and supply chain. Also write a detailed 4-5 sentence overview of today's AI landscape — what's the big picture, what should Tanner pay attention to, and what does he need to start learning or doing based on what's happening today.\n\nReturn ONLY this JSON (no explanation):\n{\n  "articles": [\n    { "title": "...", "url": "...", "summary": "3-4 sentences: what it is, why it matters, what Tanner should take away" }\n  ],\n  "overview": "4-5 sentence big picture analysis of today in AI, with specific callouts for what Tanner should be learning or paying attention to"\n}`
         }
       ],
       temperature: 0.4,
-      max_tokens: 700
+      max_tokens: 1500
     });
 
     const text = completion.choices[0].message.content;
