@@ -257,15 +257,14 @@
 
     .gallery-grid {
       columns: 3;
-      column-gap: 16px;
+      column-gap: 14px;
     }
     @media (max-width: 900px) { .gallery-grid { columns: 2; } }
-    @media (max-width: 500px) { .gallery-grid { columns: 1; } }
+    @media (max-width: 480px) { .gallery-grid { columns: 2; column-gap: 10px; } }
 
     .gallery-item {
       break-inside: avoid;
-      margin-bottom: 16px;
-      position: relative;
+      margin-bottom: 14px;
       border-radius: var(--radius);
       overflow: hidden;
       cursor: pointer;
@@ -274,52 +273,48 @@
       transition: transform var(--transition), box-shadow var(--transition);
     }
     .gallery-item:hover {
-      transform: translateY(-3px) scale(1.01);
+      transform: translateY(-3px);
       box-shadow: var(--shadow-hover);
     }
-    .gallery-item img {
+
+    /* image wrapper — handles chip + delete btn positioning */
+    .img-wrap {
+      position: relative;
+      overflow: hidden;
+    }
+    .img-wrap img {
       width: 100%;
       display: block;
       transition: transform 0.3s ease;
     }
-    .gallery-item:hover img {
+    .gallery-item:hover .img-wrap img {
       transform: scale(1.03);
     }
 
-    .img-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 50%);
-      opacity: 0;
-      transition: opacity var(--transition);
-      display: flex;
-      align-items: flex-end;
-      padding: 14px;
+    /* caption always visible below the image */
+    .img-footer {
+      padding: 8px 12px 10px;
+      background: var(--white);
     }
-    .gallery-item:hover .img-overlay { opacity: 1; }
-
     .img-caption {
-      color: white;
-      font-size: 0.85rem;
-      font-weight: 400;
-      line-height: 1.3;
+      font-size: 0.8rem;
+      color: var(--ink-lt);
+      line-height: 1.4;
     }
 
+    /* category chip — always visible, top-left corner */
     .img-category-chip {
       position: absolute;
-      top: 10px;
-      left: 10px;
-      font-size: 0.7rem;
+      top: 8px;
+      left: 8px;
+      font-size: 0.65rem;
       font-weight: 500;
       color: white;
-      padding: 3px 9px;
+      padding: 2px 8px;
       border-radius: 20px;
       letter-spacing: 0.04em;
-      opacity: 0;
-      transition: opacity var(--transition);
-      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.25);
     }
-    .gallery-item:hover .img-category-chip { opacity: 1; }
 
     .img-delete-btn {
       display: none;
@@ -689,6 +684,40 @@
     }
     footer a { color: var(--coral); text-decoration: none; }
 
+    /* ── Mobile ───────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      header { height: 52px; padding: 0 16px; }
+      .logo { font-size: 1.25rem; }
+      .hero { padding: 28px 16px 20px; }
+      .hero-title { font-size: clamp(2.2rem, 10vw, 3.5rem); }
+      .hero-tagline { font-size: 0.78rem; letter-spacing: 0.1em; }
+      .tabs-wrapper { top: 52px; padding: 10px 14px 8px; }
+      .tab { padding: 8px 14px; font-size: 0.82rem; min-height: 38px; touch-action: manipulation; }
+      .add-category-btn { padding: 8px 12px; font-size: 0.82rem; }
+      .gallery-section { padding: 14px 10px 48px; }
+      .gallery-grid { column-gap: 10px; }
+      .gallery-item { margin-bottom: 10px; border-radius: 10px; }
+      .img-footer { padding: 6px 10px 8px; }
+      .img-caption { font-size: 0.75rem; }
+      .upload-fab { bottom: 16px; right: 14px; width: 52px; height: 52px; font-size: 22px; }
+      .admin-lock { bottom: 16px; left: 16px; }
+      .modal { padding: 20px 18px; border-radius: 16px; max-height: 88vh; overflow-y: auto; }
+      .modal-title { font-size: 1.2rem; margin-bottom: 16px; }
+      .drop-zone { padding: 22px 16px; }
+      .drop-zone-icon { font-size: 1.6rem; }
+      .drop-zone-text { font-size: 0.82rem; }
+      .btn { padding: 12px 16px; font-size: 0.9rem; min-height: 44px; touch-action: manipulation; }
+      .lightbox-nav { width: 36px; height: 36px; font-size: 18px; }
+      .lightbox-prev { left: 8px; }
+      .lightbox-next { right: 8px; }
+      .lightbox-img-wrap img { max-height: 70vh; }
+      footer { padding: 24px 16px 64px; }
+    }
+    @media (max-width: 380px) {
+      .hero-title { font-size: 2rem; }
+      .gallery-grid { column-gap: 8px; }
+    }
+
     /* ── Loading spinner ──────────────────────────────────────── */
     .spinner {
       width: 36px;
@@ -1042,12 +1071,12 @@ function renderGallery() {
     const item = document.createElement('div');
     item.className = 'gallery-item';
     item.innerHTML = `
-      <img src="/uploads/${img.filename}" alt="${escHtml(img.caption || img.original_name)}" loading="lazy">
-      <div class="img-overlay">
-        <div class="img-caption">${escHtml(img.caption || '')}</div>
+      <div class="img-wrap">
+        <img src="/uploads/${img.filename}" alt="${escHtml(img.caption || img.original_name)}" loading="lazy">
+        ${cat && activeCategory === 'all' ? `<div class="img-category-chip" style="background:${cat.color}">${escHtml(cat.name)}</div>` : ''}
+        <button class="img-delete-btn" onclick="event.stopPropagation();deleteImage(${img.id})" title="Delete">✕</button>
       </div>
-      ${cat ? `<div class="img-category-chip" style="background:${cat.color}">${escHtml(cat.name)}</div>` : ''}
-      <button class="img-delete-btn" onclick="event.stopPropagation();deleteImage(${img.id})" title="Delete">✕</button>
+      ${img.caption ? `<div class="img-footer"><p class="img-caption">${escHtml(img.caption)}</p></div>` : ''}
     `;
     item.addEventListener('click', () => openLightbox(idx));
     grid.appendChild(item);
