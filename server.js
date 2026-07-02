@@ -347,10 +347,10 @@ app.get('/api/ai-digest', async (req, res) => {
   }
 
   try {
-    // Fetch top AI stories by popularity (points) — the stuff actually getting traffic
+    // Fetch top AI stories by popularity and recency
     const [hotRes, newRes] = await Promise.all([
-      fetch('https://hn.algolia.com/api/v1/search?query=AI+LLM+model+release+agent+Anthropic+OpenAI+Google+Mistral&tags=story&hitsPerPage=30&numericFilters=points>30'),
-      fetch('https://hn.algolia.com/api/v1/search_by_date?query=AI+model+release+Claude+GPT+Gemini+Llama+agent&tags=story&hitsPerPage=20&numericFilters=points>20')
+      fetch('https://hn.algolia.com/api/v1/search?query=AI+LLM+model+release+agent+Anthropic+OpenAI+Google+Mistral&tags=story&hitsPerPage=30'),
+      fetch('https://hn.algolia.com/api/v1/search_by_date?query=AI+model+release+Claude+GPT+Gemini+Llama+agent&tags=story&hitsPerPage=20')
     ]);
     const [hotData, newData] = await Promise.all([hotRes.json(), newRes.json()]);
 
