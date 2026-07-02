@@ -347,17 +347,22 @@ app.get('/api/ai-digest', async (req, res) => {
   }
 
   try {
-    // Fetch top AI stories by popularity and recency
-    const [hotRes, newRes] = await Promise.all([
-      fetch('https://hn.algolia.com/api/v1/search?query=AI+LLM+model+release+agent+Anthropic+OpenAI+Google+Mistral&tags=story&hitsPerPage=30'),
-      fetch('https://hn.algolia.com/api/v1/search_by_date?query=AI+model+release+Claude+GPT+Gemini+Llama+agent&tags=story&hitsPerPage=20')
-    ]);
-    const [hotData, newData] = await Promise.all([hotRes.json(), newRes.json()]);
+    // Fetch recent AI stories from the last 7 days, sorted by date, then rank by points
+    const sevenDaysAgo = Math.floor(Date.now() / 1000) - 7 * 86400;
+    const twoDaysAgo = Math.floor(Date.now() / 1000) - 2 * 86400;
 
-    // Merge + dedupe, sort by points descending
+    const queries = [
+      `https://hn.algolia.com/api/v1/search_by_date?query=AI+LLM+agent+model&tags=story&hitsPerPage=30&numericFilters=created_at_i%3E${twoDaysAgo}`,
+      `https://hn.algolia.com/api/v1/search_by_date?query=OpenAI+Anthropic+Google+DeepMind+Mistral+Meta+AI&tags=story&hitsPerPage=20&numericFilters=created_at_i%3E${sevenDaysAgo}`,
+      `https://hn.algolia.com/api/v1/search_by_date?query=artificial+intelligence+machine+learning+business&tags=story&hitsPerPage=20&numericFilters=created_at_i%3E${twoDaysAgo}`
+    ];
+
+    const results = await Promise.all(queries.map(u => fetch(u).then(r => r.json())));
+
+    // Merge + dedupe, filter out stories with no points, sort by points
     const seen = new Set();
-    const allStories = [...(hotData.hits || []), ...(newData.hits || [])]
-      .filter(h => h.url && h.title && !seen.has(h.url) && seen.add(h.url))
+    const allStories = results.flatMap(r => r.hits || [])
+      .filter(h => h.url && h.title && (h.points || 0) >= 5 && !seen.has(h.url) && seen.add(h.url))
       .sort((a, b) => (b.points || 0) - (a.points || 0))
       .slice(0, 25);
 
