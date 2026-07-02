@@ -2,1341 +2,1319 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Accountability">
-  <meta name="theme-color" content="#0a0a0f">
-  <link rel="manifest" href="/manifest.json">
-  <link rel="apple-touch-icon" href="/icon-192.png">
-  <title>Daily Accountability</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>studio.bylilly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
   <style>
-    /* ── Reset & Base ─────────────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0a0a0f;
-      --bg2: #111118;
-      --bg3: #1a1a24;
-      --border: #2a2a3a;
-      --accent: #6c63ff;
-      --accent2: #ff6584;
-      --green: #4ade80;
-      --yellow: #fbbf24;
-      --red: #f87171;
-      --text: #f0f0f8;
-      --muted: #7070a0;
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bot: env(safe-area-inset-bottom, 0px);
+      --cream:   #faf7f2;
+      --white:   #ffffff;
+      --ink:     #2c2c2c;
+      --ink-lt:  #6b6b6b;
+      --coral:   #e88c7d;
+      --lavender:#9b8fe8;
+      --sage:    #72c4a0;
+      --gold:    #f0c040;
+      --pink:    #f0a5c0;
+      --sky:     #7ec8e3;
+      --peach:   #f5b88a;
+      --teal:    #5bbcb0;
+      --shadow:  0 2px 12px rgba(0,0,0,0.08);
+      --shadow-hover: 0 6px 24px rgba(0,0,0,0.14);
+      --radius:  14px;
+      --transition: 0.22s ease;
     }
 
-    html, body {
-      height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
-      font-size: 16px;
-      line-height: 1.5;
-      overflow: hidden;
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      min-height: 100vh;
     }
 
-    #app {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      padding-top: var(--safe-top);
-      padding-bottom: var(--safe-bot);
-    }
-
-    /* ── Header ───────────────────────────────────────────────────────────── */
-    .header {
+    /* ── Header ──────────────────────────────────────────────── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--white);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.06), var(--shadow);
+      padding: 0 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 20px 10px;
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
+      height: 64px;
     }
-    .header-title { font-size: 15px; font-weight: 600; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; }
-    .header-date { font-size: 13px; color: var(--muted); }
-    .header-stats { display: flex; gap: 12px; align-items: center; }
-    .stat-badge {
-      font-size: 12px;
-      padding: 3px 8px;
-      border-radius: 20px;
-      font-weight: 600;
-      background: var(--bg3);
-      color: var(--muted);
-    }
-    .stat-badge.active { background: rgba(108,99,255,0.2); color: var(--accent); }
 
-    /* ── Home Screen ──────────────────────────────────────────────────────── */
-    #screen-home {
-      flex: 1;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      padding: 20px;
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      line-height: 1;
+      text-decoration: none;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+    .logo span {
+      color: var(--coral);
+      font-style: italic;
+    }
+    .logo .dot {
+      color: var(--lavender);
+    }
+
+    .header-actions {
       display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .greeting {
-      font-size: 24px;
-      font-weight: 700;
-      line-height: 1.2;
-      margin-bottom: 4px;
-    }
-    .greeting .sub { font-size: 14px; font-weight: 400; color: var(--muted); margin-top: 4px; }
-
-    .checkin-cards {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .checkin-card {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 18px 16px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .checkin-card:active { transform: scale(0.97); }
-    .checkin-card.done { border-color: var(--green); background: rgba(74,222,128,0.05); }
-    .checkin-card.done .card-icon { color: var(--green); }
-    .checkin-card .card-icon { font-size: 28px; margin-bottom: 8px; display: block; }
-    .checkin-card .card-label { font-size: 14px; font-weight: 600; }
-    .checkin-card .card-status { font-size: 12px; color: var(--muted); margin-top: 2px; }
-    .checkin-card.done .card-status { color: var(--green); }
-
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      align-items: center;
       gap: 10px;
     }
 
-    .stat-card {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px 12px;
-      text-align: center;
+    /* admin mode indicator */
+    .admin-badge {
+      display: none;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: var(--coral);
+      color: #fff;
+      padding: 3px 9px;
+      border-radius: 20px;
     }
-    .stat-card .stat-val { font-size: 22px; font-weight: 700; color: var(--accent); }
-    .stat-card .stat-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    body.admin-mode .admin-badge { display: inline; }
 
-    .trend-card {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
+    /* ── Hero ────────────────────────────────────────────────── */
+    .hero {
+      padding: 64px 24px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
     }
-    .trend-card .trend-label { font-size: 12px; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
-    .weight-dots {
-      display: flex;
-      align-items: flex-end;
-      gap: 6px;
-      height: 40px;
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 20% 50%, rgba(232,140,125,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 60% at 80% 40%, rgba(155,143,232,0.10) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 50% 80%, rgba(114,196,160,0.10) 0%, transparent 60%);
+      pointer-events: none;
     }
-    .weight-dot {
-      flex: 1;
-      background: var(--accent);
-      border-radius: 3px 3px 0 0;
-      min-height: 4px;
-      opacity: 0.7;
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 8vw, 6rem);
+      line-height: 1;
+      letter-spacing: -0.02em;
       position: relative;
     }
-    .weight-dot.latest { opacity: 1; background: var(--accent2); }
-    .weight-dot .dot-val {
-      position: absolute;
-      bottom: -18px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 9px;
-      color: var(--muted);
-      white-space: nowrap;
+    .hero-title .studio {
+      color: var(--ink);
     }
-    .weight-summary { font-size: 13px; color: var(--muted); margin-top: 22px; }
-    .weight-summary .up { color: var(--red); }
-    .weight-summary .down { color: var(--green); }
-
-    .settings-btn {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px 16px;
-      cursor: pointer;
-      font-size: 14px;
-      color: var(--muted);
-      width: 100%;
-      text-align: left;
-      -webkit-tap-highlight-color: transparent;
+    .hero-title .dot {
+      color: var(--lavender);
+    }
+    .hero-title .bylilly {
+      color: var(--coral);
+      font-style: italic;
+      display: block;
     }
 
-    /* ── Chat Screen ──────────────────────────────────────────────────────── */
-    #screen-chat {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-    }
-
-    .chat-mode-label {
-      padding: 10px 20px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--muted);
-      border-bottom: 1px solid var(--border);
+    .hero-tagline {
+      margin-top: 16px;
+      font-size: 1rem;
+      color: var(--ink-lt);
+      font-weight: 300;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      position: relative;
+    }
+
+    .hero-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 24px;
+      position: relative;
+    }
+    .hero-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    /* ── Category Tabs ───────────────────────────────────────── */
+    .tabs-wrapper {
+      padding: 0 24px 0;
+      position: sticky;
+      top: 64px;
+      z-index: 90;
+      background: var(--cream);
+      padding-top: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .tabs-scroll {
       display: flex;
       align-items: center;
       gap: 8px;
-      flex-shrink: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 2px;
     }
-    .chat-mode-label .back-btn {
-      background: none;
-      border: none;
-      color: var(--accent);
-      font-size: 18px;
+    .tabs-scroll::-webkit-scrollbar { display: none; }
+
+    .tab {
+      flex-shrink: 0;
+      padding: 7px 18px;
+      border-radius: 30px;
+      border: 2px solid transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
       cursor: pointer;
-      padding: 0;
-      line-height: 1;
+      transition: all var(--transition);
+      background: var(--white);
+      color: var(--ink);
+      border-color: rgba(0,0,0,0.08);
+      user-select: none;
+      position: relative;
+    }
+    .tab:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+    .tab.active {
+      color: var(--white);
+      border-color: transparent;
+    }
+    .tab-all.active {
+      background: var(--ink);
     }
 
-    .messages {
-      flex: 1;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      padding: 16px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .msg {
-      max-width: 88%;
-      padding: 12px 16px;
-      border-radius: 18px;
-      font-size: 15px;
-      line-height: 1.5;
-      animation: fadeUp 0.2s ease;
-    }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .msg.assistant {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-bottom-left-radius: 4px;
-      align-self: flex-start;
-    }
-    .msg.user {
-      background: var(--accent);
-      color: white;
-      border-bottom-right-radius: 4px;
-      align-self: flex-end;
-    }
-    .msg.system {
-      background: rgba(251,191,36,0.1);
-      border: 1px solid rgba(251,191,36,0.3);
-      color: var(--yellow);
-      font-size: 13px;
-      align-self: center;
-      text-align: center;
-      border-radius: 10px;
-    }
-
-    .typing-indicator {
-      align-self: flex-start;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      border-bottom-left-radius: 4px;
-      padding: 12px 16px;
-      display: flex;
-      gap: 5px;
-      align-items: center;
-    }
-    .typing-dot {
-      width: 7px; height: 7px;
-      background: var(--muted);
+    .tab-delete-btn {
+      display: none;
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
-      animation: bounce 1.2s infinite;
+      background: #e74c3c;
+      color: white;
+      border: none;
+      font-size: 10px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      padding: 0;
+      font-weight: 700;
     }
-    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes bounce {
-      0%, 60%, 100% { transform: translateY(0); }
-      30% { transform: translateY(-5px); }
-    }
+    body.admin-mode .tab-delete-btn { display: flex; }
 
-    /* ── Input Area ───────────────────────────────────────────────────────── */
-    .input-area {
-      padding: 12px 16px;
-      border-top: 1px solid var(--border);
-      background: var(--bg);
+    .add-category-btn {
       flex-shrink: 0;
+      display: none;
+      padding: 7px 14px;
+      border-radius: 30px;
+      border: 2px dashed var(--lavender);
+      background: transparent;
+      color: var(--lavender);
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .add-category-btn:hover {
+      background: rgba(155,143,232,0.08);
+      transform: translateY(-1px);
+    }
+    body.admin-mode .add-category-btn { display: flex; align-items: center; gap: 4px; }
+
+    /* ── Gallery ─────────────────────────────────────────────── */
+    .gallery-section {
+      padding: 28px 20px 60px;
+      max-width: 1400px;
+      margin: 0 auto;
     }
 
-    .input-row {
+    .gallery-empty {
+      text-align: center;
+      padding: 80px 24px;
+      color: var(--ink-lt);
+    }
+    .gallery-empty .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+    }
+    .gallery-empty p { font-size: 1.05rem; }
+
+    .gallery-grid {
+      columns: 3;
+      column-gap: 16px;
+    }
+    @media (max-width: 900px) { .gallery-grid { columns: 2; } }
+    @media (max-width: 500px) { .gallery-grid { columns: 1; } }
+
+    .gallery-item {
+      break-inside: avoid;
+      margin-bottom: 16px;
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      background: var(--white);
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .gallery-item:hover {
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: var(--shadow-hover);
+    }
+    .gallery-item img {
+      width: 100%;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+    .gallery-item:hover img {
+      transform: scale(1.03);
+    }
+
+    .img-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity var(--transition);
+      display: flex;
+      align-items: flex-end;
+      padding: 14px;
+    }
+    .gallery-item:hover .img-overlay { opacity: 1; }
+
+    .img-caption {
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 400;
+      line-height: 1.3;
+    }
+
+    .img-category-chip {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: white;
+      padding: 3px 9px;
+      border-radius: 20px;
+      letter-spacing: 0.04em;
+      opacity: 0;
+      transition: opacity var(--transition);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+    .gallery-item:hover .img-category-chip { opacity: 1; }
+
+    .img-delete-btn {
+      display: none;
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(231,76,60,0.9);
+      color: white;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      backdrop-filter: blur(4px);
+      transition: all var(--transition);
+    }
+    .img-delete-btn:hover { background: #c0392b; transform: scale(1.1); }
+    body.admin-mode .img-delete-btn { display: flex; }
+
+    /* ── Upload FAB ──────────────────────────────────────────── */
+    .upload-fab {
+      display: none;
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 200;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--coral);
+      color: white;
+      border: none;
+      font-size: 26px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(232,140,125,0.5);
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition);
+    }
+    .upload-fab:hover {
+      background: #d4735f;
+      transform: scale(1.08);
+      box-shadow: 0 6px 28px rgba(232,140,125,0.6);
+    }
+    body.admin-mode .upload-fab { display: flex; }
+
+    /* ── Modals ──────────────────────────────────────────────── */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(4px);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 28px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      position: relative;
+      animation: modalIn 0.22s ease;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.94) translateY(12px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      color: var(--ink);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,0.06);
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink-lt);
+      transition: background var(--transition);
+    }
+    .modal-close:hover { background: rgba(0,0,0,0.12); }
+
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-lt);
+      margin-bottom: 6px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid rgba(0,0,0,0.12);
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      color: var(--ink);
+      background: var(--cream);
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    .form-input:focus { border-color: var(--lavender); }
+
+    select.form-input {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b6b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+
+    /* color swatches */
+    .color-swatches {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .color-swatch {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+    .color-swatch:hover { transform: scale(1.15); }
+    .color-swatch.selected { border-color: var(--ink); transform: scale(1.1); }
+
+    /* drop zone */
+    .drop-zone {
+      border: 2px dashed rgba(0,0,0,0.15);
+      border-radius: 12px;
+      padding: 32px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition);
+      background: var(--cream);
+      position: relative;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--coral);
+      background: rgba(232,140,125,0.05);
+    }
+    .drop-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    .drop-zone-icon { font-size: 2rem; margin-bottom: 8px; }
+    .drop-zone-text { color: var(--ink-lt); font-size: 0.9rem; }
+    .drop-zone-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+      justify-content: center;
+    }
+    .drop-zone-preview img {
+      width: 72px;
+      height: 72px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 2px solid rgba(0,0,0,0.08);
+    }
+
+    /* upload progress */
+    .upload-progress {
+      margin-top: 10px;
+      height: 4px;
+      background: rgba(0,0,0,0.08);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .upload-progress-bar {
+      height: 100%;
+      background: var(--coral);
+      width: 0%;
+      transition: width 0.3s ease;
+      border-radius: 4px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .btn-primary {
+      background: var(--coral);
+      color: white;
+      width: 100%;
+    }
+    .btn-primary:hover { background: #d4735f; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary {
+      background: rgba(0,0,0,0.06);
+      color: var(--ink);
+    }
+    .btn-secondary:hover { background: rgba(0,0,0,0.10); }
+
+    .modal-footer {
       display: flex;
       gap: 10px;
-      align-items: flex-end;
+      margin-top: 20px;
+    }
+    .modal-footer .btn { flex: 1; }
+
+    /* error message */
+    .form-error {
+      font-size: 0.82rem;
+      color: #e74c3c;
+      margin-top: 6px;
     }
 
-    .text-input {
-      flex: 1;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      padding: 10px 16px;
-      color: var(--text);
-      font-size: 15px;
-      outline: none;
-      resize: none;
-      max-height: 120px;
-      line-height: 1.4;
-      font-family: inherit;
-      transition: border-color 0.15s;
+    /* ── Lightbox ─────────────────────────────────────────────── */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 500;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
-    .text-input:focus { border-color: var(--accent); }
-    .text-input::placeholder { color: var(--muted); }
+    .lightbox.open { display: flex; }
 
-    .icon-btn {
-      width: 44px; height: 44px;
+    .lightbox-img-wrap {
+      position: relative;
+      max-width: 90vw;
+      max-height: 78vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox-img-wrap img {
+      max-width: 90vw;
+      max-height: 78vh;
+      object-fit: contain;
+      border-radius: 10px;
+      box-shadow: 0 20px 80px rgba(0,0,0,0.5);
+      animation: lbIn 0.2s ease;
+    }
+    @keyframes lbIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .lightbox-close {
+      position: fixed;
+      top: 20px;
+      right: 24px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
+      background: rgba(255,255,255,0.12);
       border: none;
+      color: white;
+      font-size: 20px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
+      backdrop-filter: blur(8px);
+      transition: background var(--transition);
+    }
+    .lightbox-close:hover { background: rgba(255,255,255,0.2); }
+
+    .lightbox-nav {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      border: none;
+      color: white;
       font-size: 20px;
-      flex-shrink: 0;
-      transition: all 0.15s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .icon-btn:active { transform: scale(0.92); }
-    .send-btn { background: var(--accent); color: white; }
-    .send-btn:disabled { background: var(--bg3); color: var(--muted); cursor: default; }
-    .mic-btn { background: var(--bg3); border: 1px solid var(--border); color: var(--muted); }
-    .mic-btn.recording { background: var(--red); color: white; border-color: var(--red); animation: pulse 1s infinite; }
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(248,113,113,0.4); }
-      50% { box-shadow: 0 0 0 8px rgba(248,113,113,0); }
-    }
-
-    .extra-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 8px;
-      flex-wrap: wrap;
-    }
-    .action-chip {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 6px 14px;
-      font-size: 13px;
-      color: var(--muted);
       cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-      transition: all 0.15s;
-      white-space: nowrap;
-    }
-    .action-chip:active { transform: scale(0.95); }
-    .action-chip.primary { border-color: var(--accent); color: var(--accent); background: rgba(108,99,255,0.1); }
-
-    /* ── Screenshot Upload ────────────────────────────────────────────────── */
-    .upload-area {
-      border: 2px dashed var(--border);
-      border-radius: 14px;
-      padding: 20px;
-      text-align: center;
-      margin: 12px 0;
-      cursor: pointer;
-      transition: all 0.15s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .upload-area:active, .upload-area.over { border-color: var(--accent); background: rgba(108,99,255,0.05); }
-    .upload-area .upload-icon { font-size: 32px; margin-bottom: 8px; }
-    .upload-area p { font-size: 14px; color: var(--muted); }
-
-    /* ── Settings Screen ──────────────────────────────────────────────────── */
-    #screen-settings {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .settings-group {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      overflow: hidden;
-    }
-    .settings-group-label {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-      padding: 10px 16px 6px;
-    }
-    .settings-row {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      border-top: 1px solid var(--border);
+      justify-content: center;
+      backdrop-filter: blur(8px);
+      transition: background var(--transition);
     }
-    .settings-row:first-of-type { border-top: none; }
-    .settings-row label { font-size: 14px; }
-    .settings-row input[type="time"],
-    .settings-row input[type="text"],
-    .settings-row select {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      padding: 6px 10px;
-      font-size: 14px;
-      outline: none;
+    .lightbox-nav:hover { background: rgba(255,255,255,0.22); }
+    .lightbox-prev { left: 16px; }
+    .lightbox-next { right: 16px; }
+
+    .lightbox-info {
+      margin-top: 16px;
+      text-align: center;
+      color: rgba(255,255,255,0.85);
+    }
+    .lightbox-caption {
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+    .lightbox-meta {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.45);
     }
 
-    .push-btn {
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      padding: 14px;
-      width: 100%;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .push-btn.enabled { background: var(--bg3); color: var(--green); border: 1px solid var(--green); }
-
-    /* ── Utilities ────────────────────────────────────────────────────────── */
-    .hidden { display: none !important; }
-    .screen { display: flex; flex-direction: column; flex: 1; min-height: 0; }
-    .screen.hidden { display: none !important; }
-
-    .toast {
+    /* ── Admin Login ──────────────────────────────────────────── */
+    .admin-lock {
       position: fixed;
-      bottom: calc(90px + var(--safe-bot));
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 10px 18px;
-      font-size: 13px;
-      color: var(--text);
-      z-index: 100;
-      animation: toastIn 0.2s ease, toastOut 0.2s ease 2.3s forwards;
-      pointer-events: none;
-      white-space: nowrap;
+      bottom: 20px;
+      left: 24px;
+      font-size: 1.1rem;
+      opacity: 0.25;
+      cursor: pointer;
+      transition: opacity var(--transition);
+      background: none;
+      border: none;
+      color: var(--ink);
+      padding: 6px;
     }
-    @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
-    @keyframes toastOut { from { opacity: 1; } to { opacity: 0; } }
+    .admin-lock:hover { opacity: 0.6; }
+    body.admin-mode .admin-lock { opacity: 0.7; color: var(--coral); }
 
-    /* ── Clickable stat cards ────────────────────────────────────────────────── */
-    .stat-card.tappable { cursor: pointer; }
-    .stat-card.tappable:active { transform: scale(0.95); }
-    .stat-card .tap-hint { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    /* ── Footer ──────────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 32px 24px 80px;
+      color: var(--ink-lt);
+      font-size: 0.82rem;
+    }
+    footer a { color: var(--coral); text-decoration: none; }
 
-    /* ── Modal overlay ───────────────────────────────────────────────────────── */
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 200; padding: 20px;
+    /* ── Loading spinner ──────────────────────────────────────── */
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(0,0,0,0.08);
+      border-top-color: var(--coral);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 60px auto;
     }
-    .modal-overlay.hidden { display: none; }
-    .modal-box {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: 16px; padding: 24px; width: 100%; max-width: 320px;
-    }
-    .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
-    .modal-input {
-      width: 100%; background: var(--bg3); border: 1px solid var(--border);
-      border-radius: 10px; padding: 12px 14px; font-size: 20px; color: var(--text);
-      text-align: center; font-weight: 600; margin-bottom: 12px;
-      -webkit-appearance: none;
-    }
-    .modal-input:focus { outline: none; border-color: var(--accent); }
-    .modal-btn {
-      width: 100%; padding: 13px; border-radius: 10px; border: none;
-      font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px;
-    }
-    .modal-btn.primary { background: var(--accent); color: #fff; }
-    .modal-btn.secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
-    .modal-btn.success { background: var(--green); color: #000; }
-    .modal-lift-opts { display: flex; flex-direction: column; gap: 10px; }
-
-    /* ── AI Digest card ──────────────────────────────────────────────────────── */
-    .digest-card {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 12px;
-    }
-    .digest-header {
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .digest-title { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-    .digest-refresh-btn {
-      background: none; border: none; color: var(--muted); font-size: 16px; cursor: pointer; padding: 4px;
-    }
-    .digest-overview { font-size: 13px; color: var(--muted); line-height: 1.5; }
-    .digest-articles { display: flex; flex-direction: column; gap: 10px; }
-    .digest-article { border-top: 1px solid var(--border); padding-top: 10px; }
-    .digest-article a {
-      font-size: 14px; font-weight: 600; color: var(--accent);
-      text-decoration: none; display: block; margin-bottom: 4px; line-height: 1.3;
-    }
-    .digest-article p { font-size: 13px; color: var(--muted); line-height: 1.4; margin: 0; }
-    .digest-loading { font-size: 13px; color: var(--muted); text-align: center; padding: 8px 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
-<div id="app">
-  <!-- Header -->
-  <div class="header">
-    <div>
-      <div class="header-title">Accountability</div>
-      <div class="header-date" id="header-date"></div>
-    </div>
-    <div class="header-stats">
-      <span class="stat-badge" id="streak-badge">0🔥</span>
-    </div>
+
+<!-- ── Header ──────────────────────────────────────────────── -->
+<header>
+  <a class="logo" href="/">studio<span class="dot">.</span><span>bylilly</span></a>
+  <div class="header-actions">
+    <span class="admin-badge">Admin</span>
   </div>
+</header>
 
-  <!-- Home Screen -->
-  <div id="screen-home" class="screen">
-    <div class="greeting">
-      <div id="greeting-text">Hey, Tanner.</div>
-      <div class="sub" id="greeting-sub">Loading your data...</div>
-    </div>
-
-    <div class="checkin-cards">
-      <div class="checkin-card" id="card-morning" onclick="startCheckin('morning')">
-        <span class="card-icon">🌅</span>
-        <div class="card-label">Morning</div>
-        <div class="card-status" id="morning-status">Not done</div>
-      </div>
-      <div class="checkin-card" id="card-night" onclick="startCheckin('night')">
-        <span class="card-icon">🌙</span>
-        <div class="card-label">Night</div>
-        <div class="card-status" id="night-status">Not done</div>
-      </div>
-    </div>
-
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-val" id="stat-checkin">0</div>
-        <div class="stat-lbl">Check-in streak</div>
-      </div>
-      <div class="stat-card tappable" onclick="showLiftModal()">
-        <div class="stat-val" id="stat-lift">0</div>
-        <div class="stat-lbl">Lift streak</div>
-        <div class="tap-hint">tap to log</div>
-      </div>
-      <div class="stat-card tappable" onclick="showWeightModal()">
-        <div class="stat-val" id="stat-weight">—</div>
-        <div class="stat-lbl">Last weight</div>
-        <div class="tap-hint">tap to log</div>
-      </div>
-    </div>
-
-    <div class="trend-card">
-      <div class="trend-label">Weight trend (7d)</div>
-      <div class="weight-dots" id="weight-chart"></div>
-      <div class="weight-summary" id="weight-summary">No weight data yet.</div>
-    </div>
-
-    <!-- AI Digest -->
-    <div class="digest-card" id="digest-card">
-      <div class="digest-header">
-        <span class="digest-title">🤖 Daily AI Digest</span>
-        <button class="digest-refresh-btn" onclick="loadDigest(true)" title="Refresh">↻</button>
-      </div>
-      <div id="digest-overview" class="digest-overview">
-        <span class="digest-loading">Loading today's AI news...</span>
-      </div>
-      <div id="digest-articles" class="digest-articles"></div>
-    </div>
-
-    <button class="settings-btn" onclick="showScreen('settings')">⚙️  Settings & notifications</button>
+<!-- ── Hero ────────────────────────────────────────────────── -->
+<section class="hero">
+  <h1 class="hero-title">
+    <span class="studio">studio</span><span class="dot">.</span>
+    <span class="bylilly">by lilly</span>
+  </h1>
+  <p class="hero-tagline" id="hero-tagline">handmade with love</p>
+  <div class="hero-dots">
+    <div class="hero-dot" style="background:var(--coral)"></div>
+    <div class="hero-dot" style="background:var(--lavender)"></div>
+    <div class="hero-dot" style="background:var(--sage)"></div>
+    <div class="hero-dot" style="background:var(--gold)"></div>
+    <div class="hero-dot" style="background:var(--pink)"></div>
   </div>
+</section>
 
-  <!-- Weight Modal -->
-  <div class="modal-overlay hidden" id="weight-modal">
-    <div class="modal-box">
-      <div class="modal-title">Log Today's Weight</div>
-      <input class="modal-input" id="weight-input" type="number" step="0.1" min="80" max="400" placeholder="lbs" inputmode="decimal">
-      <button class="modal-btn primary" onclick="submitWeight()">Save</button>
-      <button class="modal-btn secondary" onclick="hideWeightModal()">Cancel</button>
-    </div>
+<!-- ── Category Tabs ─────────────────────────────────────── -->
+<div class="tabs-wrapper">
+  <div class="tabs-scroll" id="tabs-scroll">
+    <button class="tab tab-all active" data-cat="all" onclick="selectTab('all')">All</button>
+    <!-- dynamic tabs injected here -->
+    <button class="add-category-btn" onclick="openAddCategoryModal()">＋ Add Category</button>
   </div>
+</div>
 
-  <!-- Lift Modal -->
-  <div class="modal-overlay hidden" id="lift-modal">
-    <div class="modal-box">
-      <div class="modal-title">Log Workout</div>
-      <div class="modal-lift-opts">
-        <button class="modal-btn success" onclick="submitLift()">✓ Lifted today</button>
-        <button class="modal-btn secondary" onclick="triggerHomeUpload()">📸 Upload Hevy screenshot</button>
-        <button class="modal-btn secondary" onclick="hideLiftModal()">Cancel</button>
-      </div>
-    </div>
+<!-- ── Gallery ───────────────────────────────────────────── -->
+<main class="gallery-section">
+  <div id="gallery-container">
+    <div class="spinner"></div>
   </div>
-  <input type="file" id="home-file-input" accept="image/*" style="display:none" onchange="handleHomeUpload(event)">
+</main>
 
-  <!-- Chat Screen -->
-  <div id="screen-chat" class="screen hidden">
-    <div class="chat-mode-label">
-      <button class="back-btn" onclick="exitChat()">‹</button>
-      <span id="chat-mode-label">Check-in</span>
-    </div>
-    <div class="messages" id="messages"></div>
-    <div class="input-area">
-      <div id="upload-zone" class="upload-area hidden" onclick="triggerUpload()">
-        <div class="upload-icon">📸</div>
-        <p>Tap to upload your Hevy screenshot</p>
-        <input type="file" id="file-input" accept="image/*" style="display:none" onchange="handleUpload(event)">
-      </div>
-      <div class="input-row">
-        <textarea
-          id="text-input"
-          class="text-input"
-          placeholder="Type a message..."
-          rows="1"
-          oninput="autoResize(this)"
-          onkeydown="handleKeydown(event)"
-        ></textarea>
-        <button class="icon-btn mic-btn" id="mic-btn" onclick="toggleRecording()">🎙</button>
-        <button class="icon-btn send-btn" id="send-btn" onclick="sendText()">↑</button>
-      </div>
-      <div class="extra-actions" id="extra-actions"></div>
-    </div>
-  </div>
+<!-- ── Upload FAB ────────────────────────────────────────── -->
+<button class="upload-fab" onclick="openUploadModal()" title="Upload Art">＋</button>
 
-  <!-- Settings Screen -->
-  <div id="screen-settings" class="screen hidden">
-    <div class="chat-mode-label">
-      <button class="back-btn" onclick="showScreen('home')">‹</button>
-      <span>Settings</span>
+<!-- ── Admin Lock ────────────────────────────────────────── -->
+<button class="admin-lock" id="admin-lock-btn" onclick="handleAdminLockClick()" title="Admin">🔒</button>
+
+<!-- ── Footer ────────────────────────────────────────────── -->
+<footer>
+  <p>© 2025 studio.bylilly · all art by lilly</p>
+</footer>
+
+<!-- ── MODALS ─────────────────────────────────────────────── -->
+
+<!-- Admin Login Modal -->
+<div class="modal-backdrop" id="modal-admin">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-admin')">✕</button>
+    <div id="admin-modal-content">
+      <h2 class="modal-title">Admin Access</h2>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="admin-password-input" placeholder="Enter password" onkeydown="if(event.key==='Enter')submitAdminLogin()">
+        <div class="form-error" id="admin-login-error" style="display:none"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-admin')">Cancel</button>
+        <button class="btn btn-primary" onclick="submitAdminLogin()">Login</button>
+      </div>
     </div>
-    <div style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px;">
-      <div class="settings-group">
-        <div class="settings-group-label">Notifications</div>
-        <div class="settings-row">
-          <label>Night check-in deadline</label>
-          <input type="time" id="setting-deadline" value="23:00" onchange="saveSetting('night_checkin_deadline', this.value)">
-        </div>
-      </div>
-      <div class="settings-group">
-        <div class="settings-group-label">Schedule</div>
-        <div class="settings-row">
-          <label>Lift days (comma-sep)</label>
-          <input type="text" id="setting-lift-days" value="mon,wed,fri" placeholder="mon,wed,fri" onchange="saveSetting('lift_days', this.value)" style="width:130px">
-        </div>
-      </div>
-      <button class="push-btn" id="push-btn" onclick="requestPushPermission()">Enable push notifications</button>
-      <div style="font-size:12px;color:var(--muted);text-align:center;padding:0 10px;">
-        Push notifications require adding this app to your home screen on iOS. Open Safari → Share → "Add to Home Screen"
+    <div id="admin-logout-content" style="display:none">
+      <h2 class="modal-title">Admin Panel</h2>
+      <p style="color:var(--ink-lt);margin-bottom:20px;font-size:0.9rem">You're logged in as admin. You can upload art, add/delete categories, and remove images.</p>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-admin')">Close</button>
+        <button class="btn btn-primary" style="background:#e74c3c" onclick="adminLogout()">Log Out</button>
       </div>
     </div>
   </div>
 </div>
 
+<!-- Add Category Modal -->
+<div class="modal-backdrop" id="modal-add-category">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-add-category')">✕</button>
+    <h2 class="modal-title">New Category</h2>
+    <div class="form-group">
+      <label class="form-label">Category Name</label>
+      <input class="form-input" type="text" id="cat-name-input" placeholder="e.g. Ceramics" onkeydown="if(event.key==='Enter')submitAddCategory()">
+      <div class="form-error" id="cat-error" style="display:none"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Color</label>
+      <div class="color-swatches" id="color-swatches">
+        <!-- injected by JS -->
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-add-category')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitAddCategory()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- Upload Art Modal -->
+<div class="modal-backdrop" id="modal-upload">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-upload')">✕</button>
+    <h2 class="modal-title">Upload Art</h2>
+    <div class="form-group">
+      <label class="form-label">Category</label>
+      <select class="form-input" id="upload-category-select">
+        <!-- populated dynamically -->
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Images</label>
+      <div class="drop-zone" id="drop-zone">
+        <input type="file" id="upload-file-input" accept="image/*" multiple onchange="handleFileSelect(this.files)">
+        <div class="drop-zone-icon">🖼️</div>
+        <div class="drop-zone-text">Drag & drop images here or tap to browse</div>
+        <div class="drop-zone-preview" id="drop-zone-preview"></div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Caption (optional)</label>
+      <input class="form-input" type="text" id="upload-caption" placeholder="Add a caption for all uploaded images...">
+    </div>
+    <div class="upload-progress" id="upload-progress" style="display:none">
+      <div class="upload-progress-bar" id="upload-progress-bar"></div>
+    </div>
+    <div class="form-error" id="upload-error" style="display:none"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-upload')">Cancel</button>
+      <button class="btn btn-primary" id="upload-submit-btn" onclick="submitUpload()">Upload</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightboxOutside(event)">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <button class="lightbox-nav lightbox-prev" onclick="lightboxNav(-1)">‹</button>
+  <button class="lightbox-nav lightbox-next" onclick="lightboxNav(1)">›</button>
+  <div class="lightbox-img-wrap">
+    <img id="lightbox-img" src="" alt="">
+  </div>
+  <div class="lightbox-info">
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+    <div class="lightbox-meta" id="lightbox-meta"></div>
+  </div>
+</div>
+
 <script>
-// ── State ─────────────────────────────────────────────────────────────────────
-const API = ''; // relative — served by same origin
-let currentScreen = 'home';
-let currentMode = null; // 'morning' | 'night'
-let messages = []; // { role, content }
-let isRecording = false;
-let mediaRecorder = null;
-let audioChunks = [];
-let todayData = {};
-let workoutUploaded = false;
-let checkinData = {};
+// ── State ──────────────────────────────────────────────────────────────────────
+let categories = [];
+let allImages = [];
+let currentImages = []; // images in current view (for lightbox nav)
+let currentLightboxIdx = 0;
+let activeCategory = 'all';
+let adminToken = localStorage.getItem('lily_admin_token') || null;
+let selectedFiles = [];
+let selectedColor = '#e88c7d';
+let pendingDeleteCatId = null;
+
+const PRESET_COLORS = [
+  { name: 'Coral',    hex: '#e88c7d' },
+  { name: 'Lavender', hex: '#9b8fe8' },
+  { name: 'Sage',     hex: '#72c4a0' },
+  { name: 'Gold',     hex: '#f0c040' },
+  { name: 'Pink',     hex: '#f0a5c0' },
+  { name: 'Sky',      hex: '#7ec8e3' },
+  { name: 'Peach',    hex: '#f5b88a' },
+  { name: 'Teal',     hex: '#5bbcb0' },
+];
+
+const TAGLINES = [
+  'handmade with love',
+  'art from the heart',
+  'creating every day',
+  'color + texture + soul',
+  'ceramics · painting · drawing',
+];
 
 // ── Init ──────────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', async () => {
-  // Register service worker
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(console.error);
+document.addEventListener('DOMContentLoaded', () => {
+  // Rotating tagline
+  let taglineIdx = 0;
+  const taglineEl = document.getElementById('hero-tagline');
+  setInterval(() => {
+    taglineIdx = (taglineIdx + 1) % TAGLINES.length;
+    taglineEl.style.opacity = 0;
+    setTimeout(() => {
+      taglineEl.textContent = TAGLINES[taglineIdx];
+      taglineEl.style.opacity = 1;
+    }, 300);
+  }, 3500);
+  taglineEl.style.transition = 'opacity 0.3s ease';
+
+  // Color swatches
+  buildColorSwatches();
+
+  // Check admin session
+  if (adminToken) {
+    document.body.classList.add('admin-mode');
   }
 
-  updateHeaderDate();
-  await loadTodayData();
-  renderHome();
-  loadDigest();
+  // Load data
+  loadAll();
+
+  // Drag-drop on drop zone
+  const dz = document.getElementById('drop-zone');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault();
+    dz.classList.remove('dragover');
+    handleFileSelect(e.dataTransfer.files);
+  });
+
+  // Keyboard nav for lightbox
+  document.addEventListener('keydown', e => {
+    if (!document.getElementById('lightbox').classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') lightboxNav(-1);
+    if (e.key === 'ArrowRight') lightboxNav(1);
+  });
 });
 
-function updateHeaderDate() {
-  const d = new Date();
-  const opts = { weekday: 'short', month: 'short', day: 'numeric' };
-  document.getElementById('header-date').textContent = d.toLocaleDateString('en-US', opts);
+// ── API helpers ───────────────────────────────────────────────────────────────
+async function api(method, url, body) {
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+  };
+  if (adminToken) opts.headers['Authorization'] = `Bearer ${adminToken}`;
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(url, opts);
+  return res.json();
 }
 
-async function loadTodayData() {
-  try {
-    const res = await fetch(`${API}/api/today`);
-    todayData = await res.json();
-  } catch (e) {
-    todayData = {};
-    console.error('Could not load today data', e);
-  }
+// ── Load ──────────────────────────────────────────────────────────────────────
+async function loadAll() {
+  const [cats, imgs] = await Promise.all([
+    fetch('/api/categories').then(r => r.json()),
+    fetch('/api/images').then(r => r.json()),
+  ]);
+  categories = cats;
+  allImages = imgs;
+  renderTabs();
+  renderGallery();
 }
 
-// ── Home Screen ───────────────────────────────────────────────────────────────
-function renderHome() {
-  const hour = new Date().getHours();
-  let greeting = hour < 12 ? 'Morning, Tanner.' : hour < 17 ? 'Hey, Tanner.' : 'Evening, Tanner.';
-  document.getElementById('greeting-text').textContent = greeting;
-
-  const morningDone = todayData.morningDone;
-  const nightDone = todayData.nightDone;
-
-  // Greeting sub
-  let sub = '';
-  if (!morningDone && hour < 11) sub = 'Morning check-in is up first.';
-  else if (!nightDone && hour >= 20) sub = "Night check-in is waiting. Don't ghost it.";
-  else if (morningDone && nightDone) sub = "Both check-ins done. Nice.";
-  else sub = 'Tap a check-in to start.';
-  document.getElementById('greeting-sub').textContent = sub;
-
-  // Cards
-  const mCard = document.getElementById('card-morning');
-  const nCard = document.getElementById('card-night');
-  document.getElementById('morning-status').textContent = morningDone ? '✓ Done' : 'Not done';
-  document.getElementById('night-status').textContent = nightDone ? '✓ Done' : 'Not done';
-  mCard.classList.toggle('done', !!morningDone);
-  nCard.classList.toggle('done', !!nightDone);
-
-  // Stats
-  document.getElementById('stat-checkin').textContent = todayData.checkinStreak || 0;
-  document.getElementById('stat-lift').textContent = todayData.liftStreak || 0;
-  const streak = (todayData.checkinStreak || 0);
-  const streakBadge = document.getElementById('streak-badge');
-  streakBadge.textContent = `${streak}🔥`;
-  streakBadge.classList.toggle('active', streak > 0);
-
-  // Weight
-  const weights = todayData.weights || [];
-  if (weights.length) {
-    const last = weights[weights.length - 1];
-    document.getElementById('stat-weight').textContent = last.weight + 'lb';
-    renderWeightChart(weights);
-  }
-
-  // Weight trend
-  const trend = todayData.weightTrend;
-  const wSummary = document.getElementById('weight-summary');
-  if (trend) {
-    const arrow = trend.direction === 'up' ? '▲' : trend.direction === 'down' ? '▼' : '→';
-    const cls = trend.direction === 'up' ? 'up' : trend.direction === 'down' ? 'down' : '';
-    wSummary.innerHTML = `7-day change: <span class="${cls}">${arrow} ${Math.abs(trend.diff)} lbs</span>`;
-  }
+function getCategoryById(id) {
+  return categories.find(c => c.id === id) || null;
 }
 
-function renderWeightChart(weights) {
-  const container = document.getElementById('weight-chart');
-  if (!weights.length) return;
-  const vals = weights.map(w => w.weight);
-  const min = Math.min(...vals);
-  const max = Math.max(...vals);
-  const range = max - min || 1;
-  container.innerHTML = weights.map((w, i) => {
-    const pct = ((w.weight - min) / range) * 100;
-    const height = Math.max(10, pct);
-    const isLatest = i === weights.length - 1;
-    return `<div class="weight-dot ${isLatest ? 'latest' : ''}" style="height:${height}%">
-      <span class="dot-val">${isLatest ? w.weight : ''}</span>
-    </div>`;
-  }).join('');
-}
+// ── Tabs ──────────────────────────────────────────────────────────────────────
+function renderTabs() {
+  const scroll = document.getElementById('tabs-scroll');
+  // Remove dynamic tabs (keep "All" tab and "Add Category" btn)
+  scroll.querySelectorAll('.tab:not(.tab-all), .tab-separator').forEach(el => el.remove());
 
-// ── Screen Navigation ─────────────────────────────────────────────────────────
-function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-  document.getElementById(`screen-${name}`).classList.remove('hidden');
-  currentScreen = name;
-}
+  const addBtn = scroll.querySelector('.add-category-btn');
 
-// ── Check-in Flow ─────────────────────────────────────────────────────────────
-async function startCheckin(mode) {
-  currentMode = mode;
-  messages = [];
-  checkinData = {};
-  workoutUploaded = false;
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (activeCategory === cat.id ? ' active' : '');
+    btn.dataset.cat = cat.id;
+    btn.style.background = activeCategory === cat.id ? cat.color : '';
+    btn.style.borderColor = activeCategory === cat.id ? cat.color : '';
+    btn.style.color = activeCategory === cat.id ? 'white' : cat.color;
+    btn.innerHTML = `${cat.name}
+      <button class="tab-delete-btn" onclick="event.stopPropagation();deleteCategoryConfirm(${cat.id},'${cat.name.replace(/'/g,"\\'")}')">✕</button>`;
+    btn.addEventListener('click', () => selectTab(cat.id));
+    scroll.insertBefore(btn, addBtn);
+  });
 
-  document.getElementById('chat-mode-label').textContent =
-    mode === 'morning' ? '🌅 Morning Check-in' : '🌙 Night Check-in';
-
-  showScreen('chat');
-  clearMessages();
-  document.getElementById('upload-zone').classList.add('hidden');
-  renderExtraActions([]);
-
-  // Opening message from AI
-  const openingMessage = mode === 'morning'
-    ? `Morning. Let's do this quick.
-
-First — what time did you wake up?
-
-Also, I'll pull up your plan for today in a sec. Let me know if anything's changed.`
-    : `Alright, let's do the night check-in. This'll take a few minutes.
-
-Start with your weight today.`;
-
-  appendMessage('assistant', openingMessage);
-  speakText(openingMessage);
-
-  if (mode === 'morning') {
-    const plan = todayData.plan;
-    if (plan?.plan?.length) {
-      const planText = `Here's what you had planned:\n${plan.plan.map(p => `• ${p.time} — ${p.activity}`).join('\n')}\n\nAnything changing today, or are you locked in?`;
-      setTimeout(() => {
-        appendMessage('assistant', planText);
-        speakText(planText);
-      }, 1500);
-    }
-    setTimeout(() => renderExtraActions(['Pet care ✅', 'Pet care ❌', 'Everything looks good']), 2000);
-  }
-}
-
-async function sendMessage(text) {
-  if (!text.trim()) return;
-
-  appendMessage('user', text);
-  messages.push({ role: 'user', content: text });
-  renderExtraActions([]);
-
-  const typing = showTyping();
-
-  try {
-    const res = await fetch(`${API}/api/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages, mode: currentMode })
-    });
-    const data = await res.json();
-    removeTyping(typing);
-
-    if (data.text) {
-      appendMessage('assistant', data.text);
-      messages.push({ role: 'assistant', content: data.text });
-      speakText(data.text);
-
-      // Detect if we should show the workout upload prompt
-      const text_lower = data.text.toLowerCase();
-      if (currentMode === 'night' && !workoutUploaded &&
-          (text_lower.includes('workout') || text_lower.includes('lift') || text_lower.includes('hevy'))) {
-        renderExtraActions(['📸 Upload Hevy screenshot', 'I didn\'t lift today', 'Rest day']);
-      }
-
-      // Detect if we're wrapping up the check-in (keyword shortcut)
-      if (text_lower.includes('all set') || text_lower.includes('check-in complete') ||
-          text_lower.includes("that's it") || text_lower.includes("you're done")) {
-        setTimeout(() => finishCheckin(), 1000);
-      }
-
-      // After 4+ exchanges, show manual finish button (always escapable)
-      if (messages.filter(m => m.role === 'user').length >= 3) {
-        const actions = document.getElementById('extra-actions');
-        if (!actions.querySelector('[data-finish]')) {
-          const chip = document.createElement('div');
-          chip.className = 'action-chip primary';
-          chip.dataset.finish = '1';
-          chip.textContent = '✓ Save & finish check-in';
-          chip.onclick = () => finishCheckin();
-          actions.appendChild(chip);
-        }
-      }
-    }
-  } catch (e) {
-    removeTyping(typing);
-    appendMessage('system', 'Connection error. Check your internet and try again.');
-  }
-}
-
-async function finishCheckin() {
-  const typing = showTyping();
-  try {
-    const res = await fetch(`${API}/api/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages, mode: currentMode, extractData: true })
-    });
-    const { data } = await res.json();
-    removeTyping(typing);
-
-    if (data && Object.keys(data).length) {
-      const today = new Date().toISOString().slice(0, 10);
-      await fetch(`${API}/api/checkin`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: currentMode, date: today, data })
-      });
-
-      checkinData = data;
-      renderExtraActions([]);
-      appendMessage('system', '✓ Check-in saved');
-
-      // Update local state
-      if (currentMode === 'morning') todayData.morningDone = true;
-      if (currentMode === 'night') todayData.nightDone = true;
-      todayData.checkinStreak = (todayData.checkinStreak || 0) + 1;
-
-      setTimeout(() => {
-        showScreen('home');
-        renderHome();
-        showToast('Check-in saved ✓');
-      }, 1500);
-    }
-  } catch (e) {
-    removeTyping(typing);
-    console.error('Could not save check-in', e);
-  }
-}
-
-function exitChat() {
-  // Offer to save if we have messages
-  if (messages.length > 2) {
-    if (confirm('Leave this check-in? Progress won\'t be saved.')) {
-      showScreen('home');
-    }
+  // Update "All" tab styles
+  const allTab = scroll.querySelector('.tab-all');
+  if (activeCategory === 'all') {
+    allTab.classList.add('active');
   } else {
-    showScreen('home');
+    allTab.classList.remove('active');
   }
 }
 
-// ── Chip Actions ──────────────────────────────────────────────────────────────
-function renderExtraActions(actions) {
-  const container = document.getElementById('extra-actions');
-  if (!actions.length) { container.innerHTML = ''; return; }
-  container.innerHTML = actions.map(a => {
-    const isPrimary = a.includes('📸') || a.includes('✅');
-    return `<div class="action-chip ${isPrimary ? 'primary' : ''}" onclick="chipAction('${a}')">${a}</div>`;
-  }).join('');
-}
+function selectTab(catId) {
+  activeCategory = catId;
+  // Update tab visuals
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const clicked = document.querySelector(`.tab[data-cat="${catId}"]`);
+  if (clicked) clicked.classList.add('active');
 
-function chipAction(action) {
-  if (action.includes('Upload Hevy')) {
-    document.getElementById('upload-zone').classList.remove('hidden');
-    renderExtraActions([]);
-    return;
-  }
-  sendMessage(action);
-}
-
-// ── Voice Recording ───────────────────────────────────────────────────────────
-async function toggleRecording() {
-  if (isRecording) {
-    stopRecording();
-  } else {
-    await startRecording();
-  }
-}
-
-async function startRecording() {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const mimeType = MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : 'audio/webm';
-    mediaRecorder = new MediaRecorder(stream, { mimeType });
-    audioChunks = [];
-
-    mediaRecorder.ondataavailable = (e) => {
-      if (e.data.size > 0) audioChunks.push(e.data);
-    };
-
-    mediaRecorder.onstop = async () => {
-      stream.getTracks().forEach(t => t.stop());
-      const blob = new Blob(audioChunks, { type: mimeType });
-      await transcribeAudio(blob, mimeType);
-    };
-
-    mediaRecorder.start();
-    isRecording = true;
-    document.getElementById('mic-btn').classList.add('recording');
-    document.getElementById('mic-btn').textContent = '⏹';
-  } catch (e) {
-    showToast('Microphone access denied');
-    console.error(e);
-  }
-}
-
-function stopRecording() {
-  if (mediaRecorder && isRecording) {
-    mediaRecorder.stop();
-    isRecording = false;
-    document.getElementById('mic-btn').classList.remove('recording');
-    document.getElementById('mic-btn').textContent = '🎙';
-    showToast('Transcribing...');
-  }
-}
-
-async function transcribeAudio(blob, mimeType) {
-  const formData = new FormData();
-  const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
-  formData.append('audio', blob, `recording.${ext}`);
-
-  try {
-    const res = await fetch(`${API}/api/transcribe`, { method: 'POST', body: formData });
-    const { text } = await res.json();
-    if (text && text.trim()) {
-      document.getElementById('text-input').value = text;
-      autoResize(document.getElementById('text-input'));
-      sendText();
+  categories.forEach(cat => {
+    const t = document.querySelector(`.tab[data-cat="${cat.id}"]`);
+    if (!t) return;
+    if (cat.id === catId) {
+      t.style.background = cat.color;
+      t.style.borderColor = cat.color;
+      t.style.color = 'white';
     } else {
-      showToast("Couldn't catch that — try again");
+      t.style.background = '';
+      t.style.borderColor = '';
+      t.style.color = cat.color;
     }
-  } catch (e) {
-    showToast('Transcription failed');
-    console.error(e);
-  }
+  });
+
+  renderGallery();
 }
 
-// ── TTS ───────────────────────────────────────────────────────────────────────
-let currentAudio = null;
+// ── Gallery ───────────────────────────────────────────────────────────────────
+function renderGallery() {
+  const container = document.getElementById('gallery-container');
 
-async function speakText(text) {
-  if (currentAudio) { currentAudio.pause(); currentAudio = null; }
-  // Only speak the first ~200 chars to keep it snappy
-  const snippet = text.slice(0, 250);
-  try {
-    const res = await fetch(`${API}/api/tts`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: snippet })
-    });
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    currentAudio = new Audio(url);
-    currentAudio.play().catch(() => {}); // iOS requires user gesture — silently fail
-  } catch (e) {
-    // TTS is nice-to-have — don't blow up if it fails
-  }
-}
+  const imgs = activeCategory === 'all'
+    ? allImages
+    : allImages.filter(i => i.category_id === activeCategory);
 
-// ── Workout Screenshot ────────────────────────────────────────────────────────
-function triggerUpload() {
-  document.getElementById('file-input').click();
-}
+  currentImages = imgs;
 
-async function handleUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  document.getElementById('upload-zone').classList.add('hidden');
-  appendMessage('system', '📸 Analyzing your Hevy screenshot...');
-
-  const formData = new FormData();
-  formData.append('screenshot', file);
-
-  try {
-    const res = await fetch(`${API}/api/analyze-workout`, { method: 'POST', body: formData });
-    const data = await res.json();
-
-    if (!data.isWorkout) {
-      appendMessage('system', "That doesn't look like a Hevy workout screenshot. Try again.");
-      return;
-    }
-
-    const today = new Date().toISOString().slice(0, 10);
-    await fetch(`${API}/api/log-workout`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ date: today, verified: true, details: data })
-    });
-
-    workoutUploaded = true;
-    const summary = `Got it — workout verified ✓\n${data.summary}\n${data.exercises?.length ? `${data.exercises.length} exercises logged.` : ''}`;
-    appendMessage('assistant', summary);
-    messages.push({ role: 'assistant', content: `Workout verified from Hevy screenshot: ${JSON.stringify(data)}` });
-    speakText(summary);
-    todayData.liftStreak = (todayData.liftStreak || 0) + 1;
-  } catch (e) {
-    appendMessage('system', 'Could not analyze screenshot. You can continue without it.');
-    console.error(e);
-  }
-}
-
-// ── Text Input ────────────────────────────────────────────────────────────────
-function sendText() {
-  const input = document.getElementById('text-input');
-  const text = input.value.trim();
-  if (!text) return;
-  input.value = '';
-  autoResize(input);
-  sendMessage(text);
-}
-
-function handleKeydown(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendText();
-  }
-}
-
-function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-}
-
-// ── Message Rendering ─────────────────────────────────────────────────────────
-function appendMessage(role, content) {
-  const msgs = document.getElementById('messages');
-  const div = document.createElement('div');
-  div.className = `msg ${role}`;
-  div.textContent = content;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-  return div;
-}
-
-function clearMessages() {
-  document.getElementById('messages').innerHTML = '';
-}
-
-function showTyping() {
-  const msgs = document.getElementById('messages');
-  const div = document.createElement('div');
-  div.className = 'typing-indicator';
-  div.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-  return div;
-}
-
-function removeTyping(el) {
-  if (el && el.parentNode) el.parentNode.removeChild(el);
-}
-
-// ── Toast ─────────────────────────────────────────────────────────────────────
-function showToast(msg) {
-  const existing = document.querySelector('.toast');
-  if (existing) existing.remove();
-  const div = document.createElement('div');
-  div.className = 'toast';
-  div.textContent = msg;
-  document.body.appendChild(div);
-  setTimeout(() => div.remove(), 2600);
-}
-
-// ── Settings ──────────────────────────────────────────────────────────────────
-async function saveSetting(key, value) {
-  try {
-    await fetch(`${API}/api/settings`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key, value })
-    });
-    showToast('Saved');
-  } catch (e) {
-    showToast('Save failed');
-  }
-}
-
-async function loadSettings() {
-  try {
-    const res = await fetch(`${API}/api/settings`);
-    const s = await res.json();
-    const dl = document.getElementById('setting-deadline');
-    const ld = document.getElementById('setting-lift-days');
-    if (dl && s.night_checkin_deadline) dl.value = s.night_checkin_deadline;
-    if (ld && s.lift_days) ld.value = s.lift_days;
-  } catch (e) {}
-}
-
-loadSettings();
-
-// ── Push Notifications ────────────────────────────────────────────────────────
-async function requestPushPermission() {
-  const btn = document.getElementById('push-btn');
-
-  if (!('Notification' in window) || !('PushManager' in window)) {
-    showToast('Push not supported — add to home screen first');
+  if (!imgs.length) {
+    container.innerHTML = `
+      <div class="gallery-empty">
+        <div class="empty-icon">${activeCategory === 'all' ? '🎨' : '✨'}</div>
+        <p>${activeCategory === 'all' ? 'No art uploaded yet.' : 'Nothing in this category yet.'}</p>
+        ${adminToken ? '<p style="margin-top:8px;font-size:0.85rem;color:var(--ink-lt)">Tap the + button to upload!</p>' : ''}
+      </div>`;
     return;
   }
 
-  const permission = await Notification.requestPermission();
-  if (permission !== 'granted') {
-    showToast('Notification permission denied');
-    return;
-  }
+  const grid = document.createElement('div');
+  grid.className = 'gallery-grid';
 
-  try {
-    const keyRes = await fetch(`${API}/api/vapid-public-key`);
-    const { key } = await keyRes.json();
-    if (!key) { showToast('Push not configured on server yet'); return; }
-
-    const reg = await navigator.serviceWorker.ready;
-    const sub = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(key)
-    });
-
-    await fetch(`${API}/api/subscribe`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ endpoint: sub.endpoint, keys: { p256dh: btoa(String.fromCharCode(...new Uint8Array(sub.getKey('p256dh')))), auth: btoa(String.fromCharCode(...new Uint8Array(sub.getKey('auth')))) } })
-    });
-
-    btn.textContent = '✓ Notifications enabled';
-    btn.classList.add('enabled');
-    showToast('Push notifications enabled!');
-  } catch (e) {
-    console.error(e);
-    showToast('Could not enable push — try from home screen');
-  }
-}
-
-function urlBase64ToUint8Array(base64String) {
-  const padding = '='.repeat((4 - base64String.length % 4) % 4);
-  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  const rawData = window.atob(base64);
-  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
-}
-
-// ── Weight Modal ──────────────────────────────────────────────────────────────
-function showWeightModal() {
-  document.getElementById('weight-modal').classList.remove('hidden');
-  setTimeout(() => document.getElementById('weight-input').focus(), 100);
-}
-
-function hideWeightModal() {
-  document.getElementById('weight-modal').classList.add('hidden');
-  document.getElementById('weight-input').value = '';
-}
-
-async function submitWeight() {
-  const val = parseFloat(document.getElementById('weight-input').value);
-  if (!val || val < 50 || val > 500) { showToast('Enter a valid weight'); return; }
-  try {
-    await fetch(`${API}/api/log-weight`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ weight: val })
-    });
-    hideWeightModal();
-    document.getElementById('stat-weight').textContent = val + 'lb';
-    showToast(`Weight logged: ${val} lbs`);
-    // Refresh home data to update chart
-    await loadTodayData();
-    renderHome();
-  } catch (e) {
-    showToast('Could not save weight');
-  }
-}
-
-// ── Lift Modal ────────────────────────────────────────────────────────────────
-function showLiftModal() {
-  document.getElementById('lift-modal').classList.remove('hidden');
-}
-
-function hideLiftModal() {
-  document.getElementById('lift-modal').classList.add('hidden');
-}
-
-async function submitLift() {
-  try {
-    const today = new Date().toISOString().slice(0, 10);
-    await fetch(`${API}/api/log-lift`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ date: today })
-    });
-    hideLiftModal();
-    showToast('Workout logged ✓');
-    await loadTodayData();
-    renderHome();
-  } catch (e) {
-    showToast('Could not log workout');
-  }
-}
-
-function triggerHomeUpload() {
-  hideLiftModal();
-  document.getElementById('home-file-input').click();
-}
-
-async function handleHomeUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  event.target.value = '';
-
-  showToast('Analyzing screenshot...');
-  const formData = new FormData();
-  formData.append('screenshot', file);
-
-  try {
-    const res = await fetch(`${API}/api/analyze-workout`, { method: 'POST', body: formData });
-    const data = await res.json();
-
-    if (!data.isWorkout) { showToast('That doesn\'t look like a Hevy screenshot'); return; }
-
-    const today = new Date().toISOString().slice(0, 10);
-    await fetch(`${API}/api/log-workout`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ date: today, verified: true, details: data })
-    });
-
-    showToast(`Workout verified: ${data.summary || 'logged ✓'}`);
-    await loadTodayData();
-    renderHome();
-  } catch (e) {
-    showToast('Upload failed — try again');
-  }
-}
-
-// ── AI Digest ─────────────────────────────────────────────────────────────────
-async function loadDigest(force = false) {
-  const overview = document.getElementById('digest-overview');
-  const articles = document.getElementById('digest-articles');
-  overview.innerHTML = '<span class="digest-loading">Loading today\'s AI news...</span>';
-  articles.innerHTML = '';
-
-  try {
-    const url = force ? `${API}/api/ai-digest?refresh=1` : `${API}/api/ai-digest`;
-    const res = await fetch(url);
-    const data = await res.json();
-    renderDigest(data);
-  } catch (e) {
-    overview.textContent = 'Could not load digest. Tap ↻ to retry.';
-  }
-}
-
-function renderDigest(data) {
-  const overview = document.getElementById('digest-overview');
-  const articles = document.getElementById('digest-articles');
-
-  const overviewText = data.overview || 'No summary available.';
-  overview.innerHTML = overviewText.split('\n\n').map(p => `<p style="margin-bottom:10px">${p}</p>`).join('');
-
-  if (data.articles && data.articles.length) {
-    articles.innerHTML = data.articles.map(a => `
-      <div class="digest-article">
-        <a href="${a.url}" target="_blank" rel="noopener noreferrer">${a.title}</a>
-        <p>${a.summary}</p>
+  imgs.forEach((img, idx) => {
+    const cat = getCategoryById(img.category_id);
+    const item = document.createElement('div');
+    item.className = 'gallery-item';
+    item.innerHTML = `
+      <img src="/uploads/${img.filename}" alt="${escHtml(img.caption || img.original_name)}" loading="lazy">
+      <div class="img-overlay">
+        <div class="img-caption">${escHtml(img.caption || '')}</div>
       </div>
-    `).join('');
-  } else {
-    articles.innerHTML = '<p class="digest-loading">No articles today.</p>';
+      ${cat ? `<div class="img-category-chip" style="background:${cat.color}">${escHtml(cat.name)}</div>` : ''}
+      <button class="img-delete-btn" onclick="event.stopPropagation();deleteImage(${img.id})" title="Delete">✕</button>
+    `;
+    item.addEventListener('click', () => openLightbox(idx));
+    grid.appendChild(item);
+  });
+
+  container.innerHTML = '';
+  container.appendChild(grid);
+}
+
+// ── Lightbox ──────────────────────────────────────────────────────────────────
+function openLightbox(idx) {
+  currentLightboxIdx = idx;
+  const lb = document.getElementById('lightbox');
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  showLightboxImage(idx);
+}
+
+function showLightboxImage(idx) {
+  const img = currentImages[idx];
+  if (!img) return;
+  const cat = getCategoryById(img.category_id);
+  document.getElementById('lightbox-img').src = `/uploads/${img.filename}`;
+  document.getElementById('lightbox-caption').textContent = img.caption || '';
+  document.getElementById('lightbox-meta').textContent =
+    [cat ? cat.name : '', img.original_name].filter(Boolean).join(' · ');
+}
+
+function lightboxNav(dir) {
+  currentLightboxIdx = (currentLightboxIdx + dir + currentImages.length) % currentImages.length;
+  showLightboxImage(currentLightboxIdx);
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeLightboxOutside(e) {
+  if (e.target === document.getElementById('lightbox')) closeLightbox();
+}
+
+// ── Admin Auth ────────────────────────────────────────────────────────────────
+let lockClickCount = 0;
+let lockClickTimer = null;
+
+function handleAdminLockClick() {
+  if (adminToken) {
+    // Already logged in — show logout panel
+    showAdminModal(true);
+    return;
   }
+  openModal('modal-admin');
+  setTimeout(() => document.getElementById('admin-password-input').focus(), 100);
+}
+
+function showAdminModal(loggedIn) {
+  document.getElementById('admin-modal-content').style.display = loggedIn ? 'none' : '';
+  document.getElementById('admin-logout-content').style.display = loggedIn ? '' : 'none';
+  openModal('modal-admin');
+}
+
+async function submitAdminLogin() {
+  const pw = document.getElementById('admin-password-input').value;
+  const errEl = document.getElementById('admin-login-error');
+  errEl.style.display = 'none';
+  if (!pw) return;
+
+  const res = await fetch('/api/admin/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: pw }),
+  });
+  const data = await res.json();
+
+  if (data.error) {
+    errEl.textContent = 'Wrong password.';
+    errEl.style.display = '';
+    document.getElementById('admin-password-input').value = '';
+    return;
+  }
+
+  adminToken = data.token;
+  localStorage.setItem('lily_admin_token', adminToken);
+  document.body.classList.add('admin-mode');
+  document.getElementById('admin-lock-btn').title = 'Admin (logged in)';
+  closeModal('modal-admin');
+  document.getElementById('admin-password-input').value = '';
+}
+
+async function adminLogout() {
+  if (adminToken) {
+    await fetch('/api/admin/logout', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${adminToken}` },
+    }).catch(() => {});
+  }
+  adminToken = null;
+  localStorage.removeItem('lily_admin_token');
+  document.body.classList.remove('admin-mode');
+  closeModal('modal-admin');
+  renderGallery(); // remove delete buttons
+}
+
+// ── Categories ────────────────────────────────────────────────────────────────
+function openAddCategoryModal() {
+  document.getElementById('cat-name-input').value = '';
+  document.getElementById('cat-error').style.display = 'none';
+  selectedColor = PRESET_COLORS[0].hex;
+  buildColorSwatches();
+  openModal('modal-add-category');
+  setTimeout(() => document.getElementById('cat-name-input').focus(), 100);
+}
+
+function buildColorSwatches() {
+  const container = document.getElementById('color-swatches');
+  if (!container) return;
+  container.innerHTML = '';
+  PRESET_COLORS.forEach(c => {
+    const sw = document.createElement('div');
+    sw.className = 'color-swatch' + (c.hex === selectedColor ? ' selected' : '');
+    sw.style.background = c.hex;
+    sw.title = c.name;
+    sw.onclick = () => {
+      selectedColor = c.hex;
+      container.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+      sw.classList.add('selected');
+    };
+    container.appendChild(sw);
+  });
+}
+
+async function submitAddCategory() {
+  const name = document.getElementById('cat-name-input').value.trim();
+  const errEl = document.getElementById('cat-error');
+  errEl.style.display = 'none';
+  if (!name) { errEl.textContent = 'Name required.'; errEl.style.display = ''; return; }
+
+  const res = await api('POST', '/api/categories', { name, color: selectedColor });
+  if (res.error) { errEl.textContent = res.error; errEl.style.display = ''; return; }
+
+  categories.push(res);
+  closeModal('modal-add-category');
+  renderTabs();
+}
+
+async function deleteCategoryConfirm(id, name) {
+  if (!confirm(`Delete "${name}" and all its images? This can't be undone.`)) return;
+  await api('DELETE', `/api/categories/${id}`);
+  categories = categories.filter(c => c.id !== id);
+  allImages = allImages.filter(i => i.category_id !== id);
+  if (activeCategory === id) activeCategory = 'all';
+  renderTabs();
+  renderGallery();
+}
+
+// ── Upload ────────────────────────────────────────────────────────────────────
+function openUploadModal() {
+  selectedFiles = [];
+  document.getElementById('drop-zone-preview').innerHTML = '';
+  document.getElementById('upload-caption').value = '';
+  document.getElementById('upload-error').style.display = 'none';
+  document.getElementById('upload-progress').style.display = 'none';
+  document.getElementById('upload-progress-bar').style.width = '0%';
+
+  // Populate category select
+  const sel = document.getElementById('upload-category-select');
+  sel.innerHTML = categories.map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('');
+  if (activeCategory !== 'all') {
+    sel.value = activeCategory;
+  }
+
+  openModal('modal-upload');
+}
+
+function handleFileSelect(files) {
+  selectedFiles = Array.from(files);
+  const preview = document.getElementById('drop-zone-preview');
+  preview.innerHTML = '';
+  selectedFiles.forEach(f => {
+    const url = URL.createObjectURL(f);
+    const img = document.createElement('img');
+    img.src = url;
+    preview.appendChild(img);
+  });
+}
+
+async function submitUpload() {
+  const errEl = document.getElementById('upload-error');
+  errEl.style.display = 'none';
+  if (!selectedFiles.length) { errEl.textContent = 'Please select at least one image.'; errEl.style.display = ''; return; }
+
+  const catId = document.getElementById('upload-category-select').value;
+  const caption = document.getElementById('upload-caption').value.trim();
+  const submitBtn = document.getElementById('upload-submit-btn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Uploading...';
+
+  const progressWrap = document.getElementById('upload-progress');
+  const progressBar = document.getElementById('upload-progress-bar');
+  progressWrap.style.display = '';
+
+  let uploaded = 0;
+  const total = selectedFiles.length;
+  const newImages = [];
+
+  for (const file of selectedFiles) {
+    const fd = new FormData();
+    fd.append('image', file);
+    fd.append('category_id', catId);
+    if (caption) fd.append('caption', caption);
+
+    try {
+      const res = await fetch('/api/images', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${adminToken}` },
+        body: fd,
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      newImages.push(data);
+    } catch (e) {
+      errEl.textContent = `Failed to upload ${file.name}: ${e.message}`;
+      errEl.style.display = '';
+    }
+
+    uploaded++;
+    progressBar.style.width = `${Math.round((uploaded / total) * 100)}%`;
+  }
+
+  allImages = [...newImages, ...allImages];
+  closeModal('modal-upload');
+  selectTab(Number(catId));
+
+  submitBtn.disabled = false;
+  submitBtn.textContent = 'Upload';
+}
+
+// ── Delete Image ──────────────────────────────────────────────────────────────
+async function deleteImage(id) {
+  if (!confirm('Delete this image? This can\'t be undone.')) return;
+  await api('DELETE', `/api/images/${id}`);
+  allImages = allImages.filter(i => i.id !== id);
+  renderGallery();
+}
+
+// ── Modal helpers ─────────────────────────────────────────────────────────────
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// Close modals on backdrop click
+document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+  backdrop.addEventListener('click', e => {
+    if (e.target === backdrop) backdrop.classList.remove('open');
+  });
+});
+
+// ── Utils ─────────────────────────────────────────────────────────────────────
+function escHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 </script>
+
 </body>
 </html>

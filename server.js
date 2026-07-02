@@ -1,437 +1,144 @@
-require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
-const multer = require('multer');
-const fs = require('fs');
 const path = require('path');
-const OpenAI = require('openai');
+const fs = require('fs');
+const multer = require('multer');
 const db = require('./db');
-const { initScheduler } = require('./scheduler');
+
+require('dotenv').config();
 
 const app = express();
-const upload = multer({ dest: '/tmp/uploads/' });
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const PORT = process.env.PORT || 3000;
 
-app.use(cors({ origin: process.env.ALLOWED_ORIGIN || '*' }));
+// In-memory admin session tokens (reset on restart, fine for a personal site)
+const validTokens = new Set();
+
+// ── Uploads directory ─────────────────────────────────────────────────────────
+
+const UPLOADS_DIR = process.env.UPLOADS_PATH || path.join(__dirname, 'data', 'uploads');
+fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, UPLOADS_DIR),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`);
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 30 * 1024 * 1024 }, // 30 MB
+  fileFilter: (req, file, cb) => {
+    const allowed = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.heic', '.avif'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, allowed.includes(ext));
+  },
+});
+
+// ── Middleware ─────────────────────────────────────────────────────────────────
+
 app.use(express.json());
+app.use('/uploads', express.static(UPLOADS_DIR));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ── Utilities ─────────────────────────────────────────────────────────────────
+// ── Auth ──────────────────────────────────────────────────────────────────────
 
-function todayString() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function tomorrowString() {
-  const d = new Date();
-  d.setDate(d.getDate() + 1);
-  return d.toISOString().slice(0, 10);
-}
-
-function buildSystemPrompt(context = {}) {
-  const checkinStreak = db.getCheckinStreak();
-  const { streak: liftStreak, recentSkips } = db.getLiftStreak();
-  const weightTrend = db.getWeightTrend();
-
-  let patterns = [];
-  if (checkinStreak > 2) patterns.push(`${checkinStreak}-day check-in streak — keep it going`);
-  if (liftStreak > 1) patterns.push(`${liftStreak} verified lifts in a row`);
-  if (recentSkips.length >= 2) patterns.push(`missed lifts on: ${recentSkips.slice(0, 3).join(', ')}`);
-  if (weightTrend && weightTrend.direction === 'up' && weightTrend.diff > 1) {
-    patterns.push(`weight has trended up ${weightTrend.diff} lbs over the last ${weightTrend.entries.length} days`);
+function requireAdmin(req, res, next) {
+  const auth = req.headers.authorization || '';
+  const token = auth.replace('Bearer ', '').trim();
+  if (!token || !validTokens.has(token)) {
+    return res.status(401).json({ error: 'Unauthorized' });
   }
-
-  return `You are Tanner's personal accountability coach built into his Daily Accountability App.
-
-PERSONA: Direct, honest, zero fluff. Think personal trainer who actually calls you out, not a wellness app that gives gold stars for breathing. You know Tanner personally — sophomore at KU studying business analytics and supply chain, chasing a summer 2027 internship, building side projects. When something's slipping, name it.
-
-RULES:
-- No filler phrases ("Great job!", "That's awesome!", "Of course!")
-- Be conversational — casual but direct
-- If data shows a pattern, call it out unprompted
-- Keep responses short and punchy unless you're walking through a full check-in
-- For the night check-in: you are structured (collect weight, plan, workout confirmation, pet care, school/job tasks) but natural, not robotic
-- Never let a bad trend slide without at least a brief callout
-
-CURRENT PATTERNS:
-${patterns.length ? patterns.map(p => `- ${p}`).join('\n') : '- No notable patterns yet'}
-
-${context.mode ? `MODE: ${context.mode}` : ''}
-${context.date ? `DATE: ${context.date}` : ''}
-${context.plan ? `TODAY'S PLAN: ${JSON.stringify(context.plan)}` : ''}
-${context.workout ? `WORKOUT LOGGED TODAY: ${JSON.stringify(context.workout)}` : ''}`;
+  next();
 }
 
-// ── Routes ────────────────────────────────────────────────────────────────────
-
-// Health check
-app.get('/api/health', (req, res) => res.json({ ok: true }));
-
-// VAPID public key (needed by frontend to subscribe to push)
-app.get('/api/vapid-public-key', (req, res) => {
-  res.json({ key: process.env.VAPID_PUBLIC_KEY || null });
+app.post('/api/admin/login', (req, res) => {
+  const { password } = req.body || {};
+  const correct = process.env.ADMIN_PASSWORD || 'lily2024';
+  if (password !== correct) {
+    return res.status(401).json({ error: 'Wrong password' });
+  }
+  const token =
+    Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+  validTokens.add(token);
+  res.json({ token });
 });
 
-// Push subscription registration
-app.post('/api/subscribe', (req, res) => {
-  const { endpoint, keys } = req.body;
-  if (!endpoint || !keys) return res.status(400).json({ error: 'Missing endpoint or keys' });
-  db.saveSubscription(endpoint, keys);
+app.post('/api/admin/logout', (req, res) => {
+  const auth = req.headers.authorization || '';
+  const token = auth.replace('Bearer ', '').trim();
+  validTokens.delete(token);
   res.json({ ok: true });
 });
 
-// Settings read/write
-app.get('/api/settings', (req, res) => {
-  const settings = {
-    night_checkin_deadline: db.get('night_checkin_deadline', '23:00'),
-    lift_days: db.get('lift_days', 'mon,wed,fri'),
-  };
-  res.json(settings);
+// ── Categories ────────────────────────────────────────────────────────────────
+
+app.get('/api/categories', (req, res) => {
+  res.json(db.getCategories());
 });
 
-app.post('/api/settings', (req, res) => {
-  const { key, value } = req.body;
-  if (!key) return res.status(400).json({ error: 'Missing key' });
-  db.set(key, value);
+app.post('/api/categories', requireAdmin, (req, res) => {
+  const { name, color } = req.body || {};
+  if (!name) return res.status(400).json({ error: 'Name required' });
+  try {
+    const cat = db.createCategory(name, color);
+    res.json(cat);
+  } catch (err) {
+    res.status(400).json({ error: 'Category already exists' });
+  }
+});
+
+app.delete('/api/categories/:id', requireAdmin, (req, res) => {
+  // Delete image files first
+  const images = db.getImages(Number(req.params.id));
+  for (const img of images) {
+    const fp = path.join(UPLOADS_DIR, img.filename);
+    if (fs.existsSync(fp)) fs.unlinkSync(fp);
+  }
+  db.deleteCategory(req.params.id);
   res.json({ ok: true });
 });
 
-// Today's data summary (used by frontend on load)
-app.get('/api/today', (req, res) => {
-  const today = todayString();
-  const tomorrow = tomorrowString();
-  const morningDone = !!db.getCheckin('morning', today);
-  const nightDone = !!db.getCheckin('night', today);
-  const plan = db.getPlan(tomorrow) || db.getPlan(today);
-  const workout = db.getWorkout(today);
-  const weights = db.getRecentWeights(7);
-  const weightTrend = db.getWeightTrend();
-  const { streak: liftStreak } = db.getLiftStreak();
-  const checkinStreak = db.getCheckinStreak();
+// ── Images ────────────────────────────────────────────────────────────────────
 
-  res.json({
-    today,
-    morningDone,
-    nightDone,
-    plan,
-    workout,
-    weights,
-    weightTrend,
-    liftStreak,
-    checkinStreak
-  });
+app.get('/api/images', (req, res) => {
+  const { category } = req.query;
+  res.json(db.getImages(category ? Number(category) : null));
 });
 
-// ── Voice: transcribe audio ───────────────────────────────────────────────────
-app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No audio file' });
+app.post('/api/images', requireAdmin, upload.single('image'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No image file' });
+  const { category_id, caption } = req.body;
+  if (!category_id) return res.status(400).json({ error: 'category_id required' });
 
-  try {
-    // Rename to give it a proper extension for Whisper
-    const ext = req.file.mimetype.includes('mp4') ? 'mp4' : 'webm';
-    const renamedPath = `${req.file.path}.${ext}`;
-    fs.renameSync(req.file.path, renamedPath);
-
-    const transcription = await openai.audio.transcriptions.create({
-      file: fs.createReadStream(renamedPath),
-      model: 'whisper-1',
-      language: 'en'
-    });
-
-    fs.unlinkSync(renamedPath);
-    res.json({ text: transcription.text });
-  } catch (err) {
-    console.error('Transcription error:', err);
-    res.status(500).json({ error: 'Transcription failed' });
-  }
+  const image = db.createImage(
+    Number(category_id),
+    req.file.filename,
+    req.file.originalname,
+    caption || null
+  );
+  res.json(image);
 });
 
-// ── Chat: AI response ─────────────────────────────────────────────────────────
-app.post('/api/chat', async (req, res) => {
-  const { messages, mode, extractData } = req.body;
-  if (!messages || !Array.isArray(messages)) {
-    return res.status(400).json({ error: 'Missing messages' });
-  }
-
-  const today = todayString();
-  const todayPlan = db.getPlan(today);
-  const workout = db.getWorkout(today);
-
-  const systemPrompt = buildSystemPrompt({
-    mode,
-    date: today,
-    plan: todayPlan?.plan,
-    workout
-  });
-
-  try {
-    // If extractData requested, add extraction instruction
-    const finalMessages = [...messages];
-    if (extractData) {
-      finalMessages.push({
-        role: 'user',
-        content: `Based on everything discussed in this check-in, extract and return ONLY a JSON object with these fields (omit any you don't have data for):
-{
-  "weight": <number or null>,
-  "plan": [{ "time": "HH:MM-HH:MM", "activity": "..." }],
-  "petFed": <true|false|null>,
-  "liftedToday": <true|false|null>,
-  "wakeTime": "HH:MM or null",
-  "sleepTime": "HH:MM or null",
-  "schoolTasks": ["..."],
-  "jobTasks": ["..."]
-}
-Return ONLY the JSON, no explanation.`
-      });
-    }
-
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [{ role: 'system', content: systemPrompt }, ...finalMessages],
-      temperature: 0.7,
-      max_tokens: extractData ? 500 : 400
-    });
-
-    const text = completion.choices[0].message.content;
-
-    if (extractData) {
-      try {
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        const data = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
-        res.json({ text: null, data });
-      } catch {
-        res.json({ text: null, data: {} });
-      }
-    } else {
-      res.json({ text });
-    }
-  } catch (err) {
-    console.error('Chat error:', err);
-    res.status(500).json({ error: 'AI response failed' });
-  }
-});
-
-// ── TTS: text to speech ───────────────────────────────────────────────────────
-app.post('/api/tts', async (req, res) => {
-  const { text } = req.body;
-  if (!text) return res.status(400).json({ error: 'No text' });
-
-  try {
-    const mp3 = await openai.audio.speech.create({
-      model: 'tts-1',
-      voice: 'onyx',   // deep, direct — fits the persona
-      input: text.slice(0, 4096)
-    });
-    const buffer = Buffer.from(await mp3.arrayBuffer());
-    res.set('Content-Type', 'audio/mpeg');
-    res.send(buffer);
-  } catch (err) {
-    console.error('TTS error:', err);
-    res.status(500).json({ error: 'TTS failed' });
-  }
-});
-
-// ── Workout screenshot analysis ───────────────────────────────────────────────
-app.post('/api/analyze-workout', upload.single('screenshot'), async (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No screenshot' });
-
-  try {
-    const imageData = fs.readFileSync(req.file.path);
-    const base64 = imageData.toString('base64');
-    const mimeType = req.file.mimetype || 'image/png';
-
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [{
-        role: 'user',
-        content: [
-          {
-            type: 'text',
-            text: `This is a screenshot from the Hevy workout app. Extract the workout data and return ONLY a JSON object:
-{
-  "isWorkout": true/false,
-  "date": "YYYY-MM-DD or null",
-  "duration": "e.g. 1h 12m or null",
-  "exercises": [
-    { "name": "Exercise Name", "sets": [{ "weight": 135, "reps": 8 }] }
-  ],
-  "summary": "One sentence description of the workout"
-}
-If this is not a Hevy workout screenshot, set isWorkout to false. Return ONLY JSON.`
-          },
-          {
-            type: 'image_url',
-            image_url: { url: `data:${mimeType};base64,${base64}` }
-          }
-        ]
-      }],
-      max_tokens: 1000
-    });
-
-    fs.unlinkSync(req.file.path);
-
-    const text = response.choices[0].message.content;
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return res.status(422).json({ error: 'Could not parse workout data' });
-
-    const data = JSON.parse(jsonMatch[0]);
-    res.json(data);
-  } catch (err) {
-    console.error('Workout analysis error:', err);
-    if (req.file?.path) fs.unlinkSync(req.file.path).catch?.(() => {});
-    res.status(500).json({ error: 'Analysis failed' });
-  }
-});
-
-// ── Save check-in data ────────────────────────────────────────────────────────
-app.post('/api/checkin', (req, res) => {
-  const { type, date, data } = req.body;
-  if (!type || !date || !data) return res.status(400).json({ error: 'Missing fields' });
-
-  const today = todayString();
-  const tomorrow = tomorrowString();
-
-  try {
-    db.logCheckin(type, date, data);
-
-    // Extract and persist structured data
-    if (data.weight != null) db.logWeight(date, data.weight);
-    if (data.plan && Array.isArray(data.plan) && data.plan.length) {
-      db.savePlan(tomorrow, data.plan);
-    }
-    if (data.liftedToday != null) {
-      const existing = db.getWorkout(date);
-      if (!existing || !existing.verified) {
-        db.logWorkout(date, false, null); // will be overwritten if screenshot uploaded
-      }
-    }
-
-    res.json({ ok: true });
-  } catch (err) {
-    console.error('Checkin save error:', err);
-    res.status(500).json({ error: 'Save failed' });
-  }
-});
-
-// ── Save workout from analyzed screenshot ─────────────────────────────────────
-app.post('/api/log-workout', (req, res) => {
-  const { date, verified, details } = req.body;
-  if (!date) return res.status(400).json({ error: 'Missing date' });
-  db.logWorkout(date, verified !== false, details || null);
+app.patch('/api/images/:id', requireAdmin, (req, res) => {
+  const { caption } = req.body || {};
+  db.updateCaption(req.params.id, caption);
   res.json({ ok: true });
 });
 
-// ── Quick weight log ──────────────────────────────────────────────────────────
-app.post('/api/log-weight', (req, res) => {
-  const { weight } = req.body;
-  if (!weight) return res.status(400).json({ error: 'Missing weight' });
-  db.logWeight(todayString(), parseFloat(weight));
+app.delete('/api/images/:id', requireAdmin, (req, res) => {
+  const image = db.getImage(req.params.id);
+  if (!image) return res.status(404).json({ error: 'Not found' });
+  const fp = path.join(UPLOADS_DIR, image.filename);
+  if (fs.existsSync(fp)) fs.unlinkSync(fp);
+  db.deleteImage(req.params.id);
   res.json({ ok: true });
 });
 
-// ── Quick lift log (self-reported, no screenshot) ─────────────────────────────
-app.post('/api/log-lift', (req, res) => {
-  const date = req.body.date || todayString();
-  db.logWorkout(date, true, null); // verified=true (self-reported)
-  res.json({ ok: true });
-});
+// ── Catch-all ─────────────────────────────────────────────────────────────────
 
-// ── AI Digest ─────────────────────────────────────────────────────────────────
-app.get('/api/ai-digest', async (req, res) => {
-  const today = todayString();
-  const forceRefresh = req.query.refresh === '1';
-
-  if (!forceRefresh) {
-    const cached = db.getDigest(today);
-    if (cached) return res.json(cached);
-  }
-
-  try {
-    // Fetch recent AI stories from the last 7 days, sorted by date, then rank by points
-    const sevenDaysAgo = Math.floor(Date.now() / 1000) - 7 * 86400;
-    const twoDaysAgo = Math.floor(Date.now() / 1000) - 2 * 86400;
-
-    const queries = [
-      `https://hn.algolia.com/api/v1/search_by_date?query=AI+LLM+agent+model&tags=story&hitsPerPage=30&numericFilters=created_at_i%3E${twoDaysAgo}`,
-      `https://hn.algolia.com/api/v1/search_by_date?query=OpenAI+Anthropic+Google+DeepMind+Mistral+Meta+AI&tags=story&hitsPerPage=20&numericFilters=created_at_i%3E${sevenDaysAgo}`,
-      `https://hn.algolia.com/api/v1/search_by_date?query=artificial+intelligence+machine+learning+business&tags=story&hitsPerPage=20&numericFilters=created_at_i%3E${twoDaysAgo}`
-    ];
-
-    const results = await Promise.all(queries.map(u => fetch(u).then(r => r.json())));
-
-    // Merge + dedupe, filter out stories with no points, sort by points
-    const seen = new Set();
-    const allStories = results.flatMap(r => r.hits || [])
-      .filter(h => h.url && h.title && (h.points || 0) >= 5 && !seen.has(h.url) && seen.add(h.url))
-      .sort((a, b) => (b.points || 0) - (a.points || 0))
-      .slice(0, 25);
-
-    if (!allStories.length) {
-      const empty = { articles: [], overview: 'No major AI news today.' };
-      db.saveDigest(today, [], empty.overview);
-      return res.json(empty);
-    }
-
-    const storiesList = allStories.map((s, i) =>
-      `${i + 1}. [${s.points || 0} pts] ${s.title} — ${s.url}`
-    ).join('\n');
-
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'system',
-          content: `You are an elite AI news editor for Tanner Brock, a 20-year-old studying business analytics and supply chain at the University of Kansas. He wants to be ahead of AI before everyone else catches up — knowing what's coming, what to learn, and what will matter for his career.
-
-ONLY cover stories that are genuinely significant. Think: new model launches, major capability breakthroughs, AI tools that are changing how businesses operate, AI agents replacing real jobs, things that will reshape industries in the next 1-3 years. Skip anything that isn't clearly important.
-
-Write with authority and directness. No filler. Tell him what's happening, why it matters, and specifically what he should do or learn because of it.`
-        },
-        {
-          role: 'user',
-          content: `Here are today's most-upvoted AI stories on Hacker News (sorted by points):\n\n${storiesList}\n\nPick the 3-5 most genuinely important stories. Skip anything minor or niche.\n\nFor each article, write 3-4 sentences: what it is, why it's a big deal right now, and what Tanner should take away.\n\nFor the overview, write 2-3 full paragraphs covering: (1) what's the biggest thing happening in AI today and why it matters, (2) how it connects to business analytics and supply chain specifically, (3) what Tanner should be learning or doing right now to stay ahead.\n\nReturn ONLY this JSON:\n{\n  "articles": [\n    { "title": "...", "url": "...", "summary": "3-4 sentences" }\n  ],\n  "overview": "2-3 full paragraphs separated by \\n\\n"\n}`
-        }
-      ],
-      temperature: 0.3,
-      max_tokens: 2000
-    });
-
-    const text = completion.choices[0].message.content;
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      return res.json({ articles: [], overview: 'Could not parse digest today.' });
-    }
-
-    const digest = JSON.parse(jsonMatch[0]);
-    db.saveDigest(today, digest.articles || [], digest.overview || '');
-    res.json(digest);
-  } catch (err) {
-    console.error('Digest error:', err);
-    res.status(500).json({ error: 'Could not fetch digest', articles: [], overview: '' });
-  }
-});
-
-// ── Stats / patterns ──────────────────────────────────────────────────────────
-app.get('/api/stats', (req, res) => {
-  const { streak: liftStreak, recentSkips } = db.getLiftStreak();
-  res.json({
-    checkinStreak: db.getCheckinStreak(),
-    liftStreak,
-    recentSkips,
-    weightTrend: db.getWeightTrend(),
-    recentWeights: db.getRecentWeights(10),
-    recentWorkouts: db.getRecentWorkouts(14)
-  });
-});
-
-// ── Catch-all → serve PWA ─────────────────────────────────────────────────────
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// ── Start ─────────────────────────────────────────────────────────────────────
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  initScheduler();
-});
+app.listen(PORT, () => console.log(`studio.bylilly running on port ${PORT}`));

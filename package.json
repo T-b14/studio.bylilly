@@ -1,26 +1,18 @@
 {
-  "name": "daily-accountability-server",
+  "name": "studio-bylilly",
   "version": "1.0.0",
-  "description": "Backend for Tanner's Daily Accountability App",
+  "description": "Artist portfolio site for studio.bylilly",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
-  },
-  "dependencies": {
-    "better-sqlite3": "^9.4.3",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.18.3",
-    "multer": "^1.4.5-lts.1",
-    "node-cron": "^3.0.3",
-    "openai": "^4.47.1",
-    "web-push": "^3.6.7"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.0"
+    "start": "node server.js"
   },
   "engines": {
     "node": "20.x"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.4.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.3",
+    "multer": "^1.4.5-lts.1"
   }
 }
