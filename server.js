@@ -347,9 +347,8 @@ app.get('/api/ai-digest', async (req, res) => {
   }
 
   try {
-    const yesterday = Math.floor(Date.now() / 1000) - 86400;
     const hnRes = await fetch(
-      `https://hn.algolia.com/api/v1/search?query=artificial+intelligence+AI+LLM+machine+learning&tags=story&hitsPerPage=30&numericFilters=created_at_i>${yesterday}`
+      'https://hn.algolia.com/api/v1/search_by_date?query=AI+LLM+machine+learning&tags=story&hitsPerPage=30'
     );
     const hnData = await hnRes.json();
     const stories = (hnData.hits || []).filter(h => h.url && h.title).slice(0, 20);
