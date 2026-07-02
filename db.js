@@ -24,6 +24,28 @@ db.exec(`
     caption       TEXT,
     created_at    INTEGER NOT NULL
   );
+
+  CREATE TABLE IF NOT EXISTS pricing (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    title       TEXT NOT NULL,
+    description TEXT,
+    price       TEXT NOT NULL,
+    created_at  INTEGER NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS page_content (
+    key        TEXT PRIMARY KEY,
+    value      TEXT NOT NULL,
+    updated_at INTEGER NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS order_photos (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    filename      TEXT NOT NULL,
+    original_name TEXT NOT NULL,
+    caption       TEXT,
+    created_at    INTEGER NOT NULL
+  );
 `);
 
 // ── Categories ────────────────────────────────────────────────────────────────
@@ -44,7 +66,7 @@ const createCategory = (name, color) => {
 const deleteCategory = (id) =>
   db.prepare('DELETE FROM categories WHERE id = ?').run(id);
 
-// ── Images ────────────────────────────────────────────────────────────────────
+// ── Gallery Images ────────────────────────────────────────────────────────────
 
 const getImages = (categoryId) => {
   if (categoryId) {
@@ -73,7 +95,73 @@ const deleteImage = (id) =>
 const updateCaption = (id, caption) =>
   db.prepare('UPDATE images SET caption = ? WHERE id = ?').run(caption, id);
 
+// ── Page Content (About bio, contact info, etc.) ──────────────────────────────
+
+const getContent = (key, fallback = '') => {
+  const row = db.prepare('SELECT value FROM page_content WHERE key = ?').get(key);
+  return row ? row.value : fallback;
+};
+
+const setContent = (key, value) => {
+  db.prepare(
+    'INSERT OR REPLACE INTO page_content (key, value, updated_at) VALUES (?, ?, ?)'
+  ).run(key, value, Date.now());
+};
+
+const getAllContent = () => {
+  const rows = db.prepare('SELECT key, value FROM page_content').all();
+  return Object.fromEntries(rows.map(r => [r.key, r.value]));
+};
+
+// ── Pricing ───────────────────────────────────────────────────────────────────
+
+const getPricing = () =>
+  db.prepare('SELECT * FROM pricing ORDER BY created_at ASC').all();
+
+const getPricingItem = (id) =>
+  db.prepare('SELECT * FROM pricing WHERE id = ?').get(id);
+
+const createPricingItem = (title, price, description) => {
+  const result = db
+    .prepare('INSERT INTO pricing (title, price, description, created_at) VALUES (?, ?, ?, ?)')
+    .run(title.trim(), price.trim(), description || null, Date.now());
+  return getPricingItem(result.lastInsertRowid);
+};
+
+const updatePricingItem = (id, title, price, description) =>
+  db.prepare('UPDATE pricing SET title = ?, price = ?, description = ? WHERE id = ?')
+    .run(title, price, description || null, id);
+
+const deletePricingItem = (id) =>
+  db.prepare('DELETE FROM pricing WHERE id = ?').run(id);
+
+// ── Order Photos ──────────────────────────────────────────────────────────────
+
+const getOrderPhotos = () =>
+  db.prepare('SELECT * FROM order_photos ORDER BY created_at DESC').all();
+
+const getOrderPhoto = (id) =>
+  db.prepare('SELECT * FROM order_photos WHERE id = ?').get(id);
+
+const createOrderPhoto = (filename, originalName, caption) => {
+  const result = db
+    .prepare('INSERT INTO order_photos (filename, original_name, caption, created_at) VALUES (?, ?, ?, ?)')
+    .run(filename, originalName, caption || null, Date.now());
+  return getOrderPhoto(result.lastInsertRowid);
+};
+
+const deleteOrderPhoto = (id) =>
+  db.prepare('DELETE FROM order_photos WHERE id = ?').run(id);
+
 module.exports = {
+  // categories
   getCategories, getCategory, createCategory, deleteCategory,
+  // gallery images
   getImages, getImage, createImage, deleteImage, updateCaption,
+  // page content
+  getContent, setContent, getAllContent,
+  // pricing
+  getPricing, getPricingItem, createPricingItem, updatePricingItem, deletePricingItem,
+  // order photos
+  getOrderPhotos, getOrderPhoto, createOrderPhoto, deleteOrderPhoto,
 };

@@ -26,1059 +26,829 @@
       --shadow:  0 2px 12px rgba(0,0,0,0.08);
       --shadow-hover: 0 6px 24px rgba(0,0,0,0.14);
       --radius:  14px;
-      --transition: 0.22s ease;
+      --tr: 0.22s ease;
+      --hdr: 60px;
+      --nav: 46px;
     }
 
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--cream);
-      color: var(--ink);
-      min-height: 100vh;
-    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; }
 
-    /* ── Header ──────────────────────────────────────────────── */
+    /* ── Header ── */
     header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      position: sticky; top: 0; z-index: 200;
       background: var(--white);
-      box-shadow: 0 1px 0 rgba(0,0,0,0.06), var(--shadow);
-      padding: 0 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 64px;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+      padding: 0 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: var(--hdr);
     }
-
-    .logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
-      line-height: 1;
-      text-decoration: none;
-      color: var(--ink);
-      letter-spacing: -0.01em;
-    }
-    .logo span {
-      color: var(--coral);
-      font-style: italic;
-    }
-    .logo .dot {
-      color: var(--lavender);
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    /* admin mode indicator */
-    .admin-badge {
-      display: none;
-      font-size: 0.7rem;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      background: var(--coral);
-      color: #fff;
-      padding: 3px 9px;
-      border-radius: 20px;
-    }
+    .logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; line-height: 1; text-decoration: none; color: var(--ink); letter-spacing: -0.01em; }
+    .logo .dot { color: var(--lavender); }
+    .logo .lilly { color: var(--coral); font-style: italic; }
+    .admin-badge { display: none; font-size: 0.68rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; background: var(--coral); color: #fff; padding: 3px 9px; border-radius: 20px; }
     body.admin-mode .admin-badge { display: inline; }
 
-    /* ── Hero ────────────────────────────────────────────────── */
-    .hero {
-      padding: 64px 24px 40px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
+    /* ── Page Nav ── */
+    .page-nav {
+      position: sticky; top: var(--hdr); z-index: 190;
+      background: var(--white);
+      border-bottom: 1.5px solid rgba(0,0,0,0.07);
+      display: flex; overflow-x: auto; scrollbar-width: none;
+      padding: 0 16px;
+      height: var(--nav);
     }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 60% 50% at 20% 50%, rgba(232,140,125,0.12) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 60% at 80% 40%, rgba(155,143,232,0.10) 0%, transparent 60%),
-        radial-gradient(ellipse 40% 40% at 50% 80%, rgba(114,196,160,0.10) 0%, transparent 60%);
-      pointer-events: none;
-    }
-
-    .hero-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(3rem, 8vw, 6rem);
-      line-height: 1;
-      letter-spacing: -0.02em;
-      position: relative;
-    }
-    .hero-title .studio {
-      color: var(--ink);
-    }
-    .hero-title .dot {
-      color: var(--lavender);
-    }
-    .hero-title .bylilly {
-      color: var(--coral);
-      font-style: italic;
-      display: block;
-    }
-
-    .hero-tagline {
-      margin-top: 16px;
-      font-size: 1rem;
+    .page-nav::-webkit-scrollbar { display: none; }
+    .page-tab {
+      flex-shrink: 0;
+      padding: 0 18px;
+      height: 100%;
+      border: none; background: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem; font-weight: 500;
       color: var(--ink-lt);
-      font-weight: 300;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      position: relative;
+      cursor: pointer;
+      border-bottom: 2.5px solid transparent;
+      margin-bottom: -1.5px;
+      white-space: nowrap;
+      transition: color var(--tr), border-color var(--tr);
+      touch-action: manipulation;
     }
+    .page-tab:hover { color: var(--ink); }
+    .page-tab.active { color: var(--coral); border-bottom-color: var(--coral); }
 
-    .hero-dots {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 24px;
-      position: relative;
-    }
-    .hero-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-    }
+    /* ── Hero (gallery page only) ── */
+    .hero { padding: 44px 20px 28px; text-align: center; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(2.6rem, 8vw, 5rem); line-height: 1; letter-spacing: -0.02em; }
+    .hero-title .bylilly { color: var(--coral); font-style: italic; display: block; }
+    .hero-title .dot { color: var(--lavender); }
+    .hero-tagline { margin-top: 12px; font-size: 0.85rem; color: var(--ink-lt); font-weight: 300; letter-spacing: 0.14em; text-transform: uppercase; transition: opacity 0.3s ease; }
+    .hero-dots { display: flex; justify-content: center; gap: 7px; margin-top: 18px; }
+    .hero-dot { width: 7px; height: 7px; border-radius: 50%; }
 
-    /* ── Category Tabs ───────────────────────────────────────── */
-    .tabs-wrapper {
-      padding: 0 24px 0;
-      position: sticky;
-      top: 64px;
-      z-index: 90;
+    /* ── Category Tabs ── */
+    .cat-tabs-wrap {
+      position: sticky; top: calc(var(--hdr) + var(--nav)); z-index: 180;
       background: var(--cream);
-      padding-top: 20px;
-      padding-bottom: 16px;
+      padding: 12px 16px 10px;
       border-bottom: 1px solid rgba(0,0,0,0.06);
     }
+    .cat-tabs-scroll { display: flex; align-items: center; gap: 7px; overflow-x: auto; scrollbar-width: none; }
+    .cat-tabs-scroll::-webkit-scrollbar { display: none; }
+    .cat-tab {
+      flex-shrink: 0; padding: 6px 16px; border-radius: 30px;
+      border: 1.5px solid rgba(0,0,0,0.1);
+      font-family: 'DM Sans', sans-serif; font-size: 0.84rem; font-weight: 500;
+      cursor: pointer; background: var(--white); color: var(--ink);
+      transition: all var(--tr); user-select: none; position: relative;
+      touch-action: manipulation; min-height: 36px;
+    }
+    .cat-tab:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+    .cat-tab-all.cat-active { background: var(--ink); color: white; border-color: var(--ink); }
+    .cat-delete-btn {
+      display: none; position: absolute; top: -5px; right: -5px;
+      width: 16px; height: 16px; border-radius: 50%; background: #e74c3c;
+      color: white; border: none; font-size: 9px; cursor: pointer;
+      align-items: center; justify-content: center; font-weight: 700;
+    }
+    body.admin-mode .cat-delete-btn { display: flex; }
+    .add-cat-btn {
+      flex-shrink: 0; display: none; padding: 6px 12px; border-radius: 30px;
+      border: 1.5px dashed var(--lavender); background: transparent; color: var(--lavender);
+      font-size: 0.84rem; font-weight: 500; cursor: pointer; transition: all var(--tr);
+      touch-action: manipulation;
+    }
+    .add-cat-btn:hover { background: rgba(155,143,232,0.08); }
+    body.admin-mode .add-cat-btn { display: flex; align-items: center; gap: 4px; }
 
-    .tabs-scroll {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      padding-bottom: 2px;
-    }
-    .tabs-scroll::-webkit-scrollbar { display: none; }
-
-    .tab {
-      flex-shrink: 0;
-      padding: 7px 18px;
-      border-radius: 30px;
-      border: 2px solid transparent;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.88rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all var(--transition);
-      background: var(--white);
-      color: var(--ink);
-      border-color: rgba(0,0,0,0.08);
-      user-select: none;
-      position: relative;
-    }
-    .tab:hover {
-      transform: translateY(-1px);
-      box-shadow: var(--shadow);
-    }
-    .tab.active {
-      color: var(--white);
-      border-color: transparent;
-    }
-    .tab-all.active {
-      background: var(--ink);
-    }
-
-    .tab-delete-btn {
-      display: none;
-      position: absolute;
-      top: -6px;
-      right: -6px;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: #e74c3c;
-      color: white;
-      border: none;
-      font-size: 10px;
-      cursor: pointer;
-      align-items: center;
-      justify-content: center;
-      line-height: 1;
-      padding: 0;
-      font-weight: 700;
-    }
-    body.admin-mode .tab-delete-btn { display: flex; }
-
-    .add-category-btn {
-      flex-shrink: 0;
-      display: none;
-      padding: 7px 14px;
-      border-radius: 30px;
-      border: 2px dashed var(--lavender);
-      background: transparent;
-      color: var(--lavender);
-      font-size: 0.88rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all var(--transition);
-    }
-    .add-category-btn:hover {
-      background: rgba(155,143,232,0.08);
-      transform: translateY(-1px);
-    }
-    body.admin-mode .add-category-btn { display: flex; align-items: center; gap: 4px; }
-
-    /* ── Gallery ─────────────────────────────────────────────── */
-    .gallery-section {
-      padding: 28px 20px 60px;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    .gallery-empty {
-      text-align: center;
-      padding: 80px 24px;
-      color: var(--ink-lt);
-    }
-    .gallery-empty .empty-icon {
-      font-size: 3rem;
-      margin-bottom: 12px;
-    }
-    .gallery-empty p { font-size: 1.05rem; }
-
-    .gallery-grid {
-      columns: 3;
-      column-gap: 14px;
-    }
+    /* ── Gallery ── */
+    .gallery-section { padding: 20px 14px 60px; max-width: 1400px; margin: 0 auto; }
+    .gallery-empty { text-align: center; padding: 64px 24px; color: var(--ink-lt); }
+    .gallery-empty .ei { font-size: 2.5rem; margin-bottom: 10px; }
+    .gallery-grid { columns: 3; column-gap: 14px; }
     @media (max-width: 900px) { .gallery-grid { columns: 2; } }
-    @media (max-width: 480px) { .gallery-grid { columns: 2; column-gap: 10px; } }
-
     .gallery-item {
-      break-inside: avoid;
-      margin-bottom: 14px;
-      border-radius: var(--radius);
-      overflow: hidden;
-      cursor: pointer;
-      box-shadow: var(--shadow);
-      background: var(--white);
-      transition: transform var(--transition), box-shadow var(--transition);
+      break-inside: avoid; margin-bottom: 14px; border-radius: var(--radius);
+      overflow: hidden; cursor: pointer; box-shadow: var(--shadow); background: var(--white);
+      transition: transform var(--tr), box-shadow var(--tr);
     }
-    .gallery-item:hover {
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-hover);
-    }
-
-    /* image wrapper — handles chip + delete btn positioning */
-    .img-wrap {
-      position: relative;
-      overflow: hidden;
-    }
-    .img-wrap img {
-      width: 100%;
-      display: block;
-      transition: transform 0.3s ease;
-    }
-    .gallery-item:hover .img-wrap img {
-      transform: scale(1.03);
-    }
-
-    /* caption always visible below the image */
-    .img-footer {
-      padding: 8px 12px 10px;
-      background: var(--white);
-    }
-    .img-caption {
-      font-size: 0.8rem;
-      color: var(--ink-lt);
-      line-height: 1.4;
-    }
-
-    /* category chip — always visible, top-left corner */
-    .img-category-chip {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      font-size: 0.65rem;
-      font-weight: 500;
-      color: white;
-      padding: 2px 8px;
-      border-radius: 20px;
-      letter-spacing: 0.04em;
+    .gallery-item:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+    .img-wrap { position: relative; overflow: hidden; }
+    .img-wrap img { width: 100%; display: block; transition: transform 0.3s ease; }
+    .gallery-item:hover .img-wrap img { transform: scale(1.03); }
+    .img-cat-chip {
+      position: absolute; top: 8px; left: 8px; font-size: 0.65rem; font-weight: 500;
+      color: white; padding: 2px 8px; border-radius: 20px;
       text-shadow: 0 1px 2px rgba(0,0,0,0.25);
     }
-
-    .img-delete-btn {
-      display: none;
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: rgba(231,76,60,0.9);
-      color: white;
-      border: none;
-      font-size: 14px;
-      cursor: pointer;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-      backdrop-filter: blur(4px);
-      transition: all var(--transition);
+    .img-del-btn {
+      display: none; position: absolute; top: 7px; right: 7px;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: rgba(231,76,60,0.9); color: white; border: none; font-size: 12px;
+      cursor: pointer; align-items: center; justify-content: center; z-index: 10;
+      transition: all var(--tr);
     }
-    .img-delete-btn:hover { background: #c0392b; transform: scale(1.1); }
-    body.admin-mode .img-delete-btn { display: flex; }
+    .img-del-btn:hover { background: #c0392b; }
+    body.admin-mode .img-del-btn { display: flex; }
+    .img-footer { padding: 7px 11px 9px; background: var(--white); }
+    .img-caption { font-size: 0.78rem; color: var(--ink-lt); line-height: 1.4; }
 
-    /* ── Upload FAB ──────────────────────────────────────────── */
+    /* ── Inner Page (About / Pricing / Order) ── */
+    .inner-page { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+    .page-header { margin-bottom: 32px; }
+    .page-header h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 5vw, 2.8rem); color: var(--ink); }
+    .page-header p { margin-top: 6px; color: var(--ink-lt); font-size: 0.9rem; }
+
+    /* Admin edit button (shows inline on pages) */
+    .edit-btn {
+      display: none; padding: 7px 16px; border-radius: 10px; border: 1.5px solid rgba(0,0,0,0.1);
+      background: var(--white); color: var(--ink-lt); font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem; cursor: pointer; transition: all var(--tr); margin-top: 16px;
+    }
+    .edit-btn:hover { border-color: var(--coral); color: var(--coral); }
+    body.admin-mode .edit-btn { display: inline-flex; align-items: center; gap: 5px; }
+
+    /* ── About Page ── */
+    .about-layout { display: grid; grid-template-columns: 220px 1fr; gap: 40px; align-items: start; }
+    @media (max-width: 640px) { .about-layout { grid-template-columns: 1fr; } }
+    .about-photo-wrap { position: relative; }
+    .about-photo {
+      width: 100%; aspect-ratio: 1; border-radius: 50%; object-fit: cover;
+      box-shadow: var(--shadow); border: 4px solid var(--white);
+    }
+    .about-photo-placeholder {
+      width: 100%; aspect-ratio: 1; border-radius: 50%;
+      background: linear-gradient(135deg, var(--coral) 0%, var(--lavender) 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem; color: white; box-shadow: var(--shadow);
+    }
+    .about-photo-upload-btn {
+      display: none; position: absolute; bottom: 4px; right: 4px;
+      width: 32px; height: 32px; border-radius: 50%; background: var(--coral);
+      border: 2px solid white; color: white; font-size: 16px; cursor: pointer;
+      align-items: center; justify-content: center; box-shadow: var(--shadow);
+    }
+    body.admin-mode .about-photo-upload-btn { display: flex; }
+    .about-photo-upload-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; border-radius: 50%; }
+    .about-bio { font-size: 1.02rem; line-height: 1.75; color: var(--ink); white-space: pre-wrap; }
+    .about-bio-empty { color: var(--ink-lt); font-style: italic; }
+    .about-bio-edit {
+      width: 100%; min-height: 200px; padding: 12px 14px;
+      border: 1.5px solid rgba(0,0,0,0.12); border-radius: 10px;
+      font-family: 'DM Sans', sans-serif; font-size: 1rem; color: var(--ink);
+      background: var(--cream); resize: vertical; outline: none;
+      transition: border-color var(--tr);
+    }
+    .about-bio-edit:focus { border-color: var(--lavender); }
+    .about-save-row { display: flex; gap: 8px; margin-top: 10px; }
+
+    /* ── Pricing Page ── */
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .price-card {
+      background: var(--white); border-radius: var(--radius); padding: 22px 20px;
+      box-shadow: var(--shadow); position: relative;
+      transition: transform var(--tr), box-shadow var(--tr);
+    }
+    .price-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+    .price-card-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; margin-bottom: 4px; }
+    .price-card-desc { font-size: 0.82rem; color: var(--ink-lt); margin-bottom: 14px; line-height: 1.4; }
+    .price-card-price { font-size: 1.6rem; font-weight: 500; color: var(--coral); }
+    .price-card-actions {
+      display: none; position: absolute; top: 10px; right: 10px; gap: 6px;
+    }
+    body.admin-mode .price-card-actions { display: flex; }
+    .price-action-btn {
+      width: 26px; height: 26px; border-radius: 50%; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 12px;
+      transition: all var(--tr);
+    }
+    .price-edit-btn { background: rgba(155,143,232,0.15); color: var(--lavender); }
+    .price-del-btn { background: rgba(231,76,60,0.12); color: #e74c3c; }
+    .price-action-btn:hover { transform: scale(1.15); }
+    .pricing-empty { text-align: center; padding: 48px 24px; color: var(--ink-lt); font-style: italic; }
+    .add-pricing-btn {
+      display: none; padding: 10px 20px; border-radius: 10px;
+      border: 1.5px dashed var(--coral); background: transparent; color: var(--coral);
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500;
+      cursor: pointer; transition: all var(--tr);
+    }
+    .add-pricing-btn:hover { background: rgba(232,140,125,0.08); }
+    body.admin-mode .add-pricing-btn { display: inline-flex; align-items: center; gap: 6px; }
+
+    /* ── Order Page ── */
+    .order-contact-card {
+      background: var(--white); border-radius: var(--radius); padding: 28px 24px;
+      box-shadow: var(--shadow); margin-bottom: 32px; text-align: center;
+    }
+    .order-contact-icon { font-size: 2.4rem; margin-bottom: 10px; }
+    .order-heading { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 8px; }
+    .order-blurb { font-size: 0.95rem; color: var(--ink-lt); line-height: 1.65; margin-bottom: 20px; white-space: pre-wrap; }
+    .order-email-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--coral); color: white; text-decoration: none;
+      padding: 12px 28px; border-radius: 30px; font-weight: 500; font-size: 0.95rem;
+      transition: background var(--tr), transform var(--tr);
+    }
+    .order-email-btn:hover { background: #d4735f; transform: translateY(-1px); }
+    .order-extras { margin-top: 16px; font-size: 0.85rem; color: var(--ink-lt); white-space: pre-wrap; line-height: 1.6; }
+    .order-photos-heading { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 16px; color: var(--ink); }
+    .order-photos-grid { columns: 3; column-gap: 12px; }
+    @media (max-width: 600px) { .order-photos-grid { columns: 2; } }
+    .order-photo-item {
+      break-inside: avoid; margin-bottom: 12px; border-radius: 10px; overflow: hidden;
+      cursor: pointer; box-shadow: var(--shadow); background: var(--white); position: relative;
+      transition: transform var(--tr);
+    }
+    .order-photo-item:hover { transform: translateY(-2px); }
+    .order-photo-item img { width: 100%; display: block; }
+    .order-photo-caption { padding: 6px 10px 8px; font-size: 0.75rem; color: var(--ink-lt); }
+    .order-photo-del {
+      display: none; position: absolute; top: 6px; right: 6px;
+      width: 24px; height: 24px; border-radius: 50%;
+      background: rgba(231,76,60,0.9); color: white; border: none; font-size: 11px;
+      cursor: pointer; align-items: center; justify-content: center;
+    }
+    body.admin-mode .order-photo-del { display: flex; }
+    .upload-order-photo-btn {
+      display: none; padding: 9px 18px; border-radius: 10px;
+      border: 1.5px dashed var(--teal); background: transparent; color: var(--teal);
+      font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 500;
+      cursor: pointer; transition: all var(--tr); margin-bottom: 20px;
+    }
+    .upload-order-photo-btn:hover { background: rgba(91,188,176,0.08); }
+    body.admin-mode .upload-order-photo-btn { display: inline-flex; align-items: center; gap: 6px; }
+
+    /* ── Upload FAB ── */
     .upload-fab {
-      display: none;
-      position: fixed;
-      bottom: 28px;
-      right: 28px;
-      z-index: 200;
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: var(--coral);
-      color: white;
-      border: none;
-      font-size: 26px;
-      cursor: pointer;
+      display: none; position: fixed; bottom: 24px; right: 20px; z-index: 200;
+      width: 52px; height: 52px; border-radius: 50%; background: var(--coral); color: white;
+      border: none; font-size: 24px; cursor: pointer;
       box-shadow: 0 4px 20px rgba(232,140,125,0.5);
-      align-items: center;
-      justify-content: center;
-      transition: all var(--transition);
+      align-items: center; justify-content: center; transition: all var(--tr);
     }
-    .upload-fab:hover {
-      background: #d4735f;
-      transform: scale(1.08);
-      box-shadow: 0 6px 28px rgba(232,140,125,0.6);
-    }
+    .upload-fab:hover { background: #d4735f; transform: scale(1.08); }
     body.admin-mode .upload-fab { display: flex; }
 
-    /* ── Modals ──────────────────────────────────────────────── */
+    /* ── Admin lock ── */
+    .admin-lock {
+      position: fixed; bottom: 16px; left: 20px; font-size: 1rem; opacity: 0.22;
+      cursor: pointer; transition: opacity var(--tr); background: none; border: none; color: var(--ink); padding: 6px;
+    }
+    .admin-lock:hover { opacity: 0.55; }
+    body.admin-mode .admin-lock { opacity: 0.65; color: var(--coral); }
+
+    /* ── Modals ── */
     .modal-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.45);
-      backdrop-filter: blur(4px);
-      z-index: 300;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45); backdrop-filter: blur(4px);
+      z-index: 400; align-items: center; justify-content: center; padding: 16px;
     }
     .modal-backdrop.open { display: flex; }
-
     .modal {
-      background: var(--white);
-      border-radius: 20px;
-      padding: 28px;
-      width: 100%;
-      max-width: 480px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-      position: relative;
-      animation: modalIn 0.22s ease;
+      background: var(--white); border-radius: 20px; padding: 24px;
+      width: 100%; max-width: 460px; max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2); position: relative;
+      animation: mIn 0.2s ease;
     }
-    @keyframes modalIn {
-      from { opacity: 0; transform: scale(0.94) translateY(12px); }
-      to   { opacity: 1; transform: scale(1) translateY(0); }
-    }
-
-    .modal-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.4rem;
-      margin-bottom: 20px;
-      color: var(--ink);
-    }
-
+    @keyframes mIn { from { opacity:0; transform:scale(0.94) translateY(10px); } to { opacity:1; transform:scale(1) translateY(0); } }
+    .modal-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 18px; }
     .modal-close {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: none;
-      background: rgba(0,0,0,0.06);
-      cursor: pointer;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--ink-lt);
-      transition: background var(--transition);
+      position: absolute; top: 14px; right: 14px; width: 30px; height: 30px;
+      border-radius: 50%; border: none; background: rgba(0,0,0,0.06);
+      cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; color: var(--ink-lt);
     }
     .modal-close:hover { background: rgba(0,0,0,0.12); }
-
-    .form-group { margin-bottom: 16px; }
-    .form-label {
-      display: block;
-      font-size: 0.82rem;
-      font-weight: 500;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--ink-lt);
-      margin-bottom: 6px;
-    }
+    .form-group { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-lt); margin-bottom: 5px; }
     .form-input {
-      width: 100%;
-      padding: 10px 14px;
-      border: 1.5px solid rgba(0,0,0,0.12);
-      border-radius: 10px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
-      color: var(--ink);
-      background: var(--cream);
-      outline: none;
-      transition: border-color var(--transition);
+      width: 100%; padding: 9px 13px; border: 1.5px solid rgba(0,0,0,0.12); border-radius: 10px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.93rem; color: var(--ink);
+      background: var(--cream); outline: none; transition: border-color var(--tr);
     }
     .form-input:focus { border-color: var(--lavender); }
-
+    textarea.form-input { resize: vertical; min-height: 100px; line-height: 1.6; }
     select.form-input {
       appearance: none;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b6b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      padding-right: 36px;
-      cursor: pointer;
+      background-repeat: no-repeat; background-position: right 12px center; padding-right: 34px; cursor: pointer;
     }
-
-    /* color swatches */
-    .color-swatches {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 4px;
-    }
-    .color-swatch {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 3px solid transparent;
-      transition: transform 0.15s ease, border-color 0.15s ease;
-    }
+    .color-swatches { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 4px; }
+    .color-swatch { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: transform 0.15s, border-color 0.15s; }
     .color-swatch:hover { transform: scale(1.15); }
     .color-swatch.selected { border-color: var(--ink); transform: scale(1.1); }
-
-    /* drop zone */
     .drop-zone {
-      border: 2px dashed rgba(0,0,0,0.15);
-      border-radius: 12px;
-      padding: 32px 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: all var(--transition);
-      background: var(--cream);
-      position: relative;
+      border: 2px dashed rgba(0,0,0,0.13); border-radius: 12px; padding: 24px 16px;
+      text-align: center; cursor: pointer; transition: all var(--tr); background: var(--cream); position: relative;
     }
-    .drop-zone:hover, .drop-zone.dragover {
-      border-color: var(--coral);
-      background: rgba(232,140,125,0.05);
-    }
-    .drop-zone input[type="file"] {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer;
-      width: 100%;
-      height: 100%;
-    }
-    .drop-zone-icon { font-size: 2rem; margin-bottom: 8px; }
-    .drop-zone-text { color: var(--ink-lt); font-size: 0.9rem; }
-    .drop-zone-preview {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-      justify-content: center;
-    }
-    .drop-zone-preview img {
-      width: 72px;
-      height: 72px;
-      object-fit: cover;
-      border-radius: 8px;
-      border: 2px solid rgba(0,0,0,0.08);
-    }
-
-    /* upload progress */
-    .upload-progress {
-      margin-top: 10px;
-      height: 4px;
-      background: rgba(0,0,0,0.08);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    .upload-progress-bar {
-      height: 100%;
-      background: var(--coral);
-      width: 0%;
-      transition: width 0.3s ease;
-      border-radius: 4px;
-    }
-
+    .drop-zone:hover, .drop-zone.dragover { border-color: var(--coral); background: rgba(232,140,125,0.04); }
+    .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .dz-icon { font-size: 1.8rem; margin-bottom: 6px; }
+    .dz-text { color: var(--ink-lt); font-size: 0.86rem; }
+    .dz-preview { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; justify-content: center; }
+    .dz-preview img { width: 64px; height: 64px; object-fit: cover; border-radius: 7px; }
+    .upload-bar { margin-top: 8px; height: 3px; background: rgba(0,0,0,0.07); border-radius: 4px; overflow: hidden; }
+    .upload-bar-fill { height: 100%; background: var(--coral); width: 0%; transition: width 0.3s ease; border-radius: 4px; }
+    .form-error { font-size: 0.8rem; color: #e74c3c; margin-top: 5px; }
+    .modal-footer { display: flex; gap: 8px; margin-top: 18px; }
+    .modal-footer .btn { flex: 1; }
     .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 10px 20px;
-      border-radius: 10px;
-      border: none;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all var(--transition);
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+      padding: 10px 18px; border-radius: 10px; border: none;
+      font-family: 'DM Sans', sans-serif; font-size: 0.92rem; font-weight: 500;
+      cursor: pointer; transition: all var(--tr); touch-action: manipulation; min-height: 42px;
     }
-    .btn-primary {
-      background: var(--coral);
-      color: white;
-      width: 100%;
-    }
+    .btn-primary { background: var(--coral); color: white; width: 100%; }
     .btn-primary:hover { background: #d4735f; }
     .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-secondary {
-      background: rgba(0,0,0,0.06);
-      color: var(--ink);
-    }
-    .btn-secondary:hover { background: rgba(0,0,0,0.10); }
+    .btn-secondary { background: rgba(0,0,0,0.06); color: var(--ink); }
+    .btn-secondary:hover { background: rgba(0,0,0,0.1); }
+    .btn-sm { padding: 7px 14px; font-size: 0.82rem; min-height: 34px; border-radius: 8px; }
 
-    .modal-footer {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .modal-footer .btn { flex: 1; }
-
-    /* error message */
-    .form-error {
-      font-size: 0.82rem;
-      color: #e74c3c;
-      margin-top: 6px;
-    }
-
-    /* ── Lightbox ─────────────────────────────────────────────── */
+    /* ── Lightbox ── */
     .lightbox {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.92);
-      z-index: 500;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92);
+      z-index: 500; flex-direction: column; align-items: center; justify-content: center;
     }
     .lightbox.open { display: flex; }
+    .lightbox-img-wrap { max-width: 90vw; max-height: 78vh; display: flex; align-items: center; justify-content: center; }
+    .lightbox-img-wrap img { max-width: 90vw; max-height: 78vh; object-fit: contain; border-radius: 8px; animation: lbIn 0.2s ease; }
+    @keyframes lbIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+    .lb-close { position: fixed; top: 16px; right: 20px; width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.12); border: none; color: white; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .lb-close:hover { background: rgba(255,255,255,0.2); }
+    .lb-nav { position: fixed; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.12); border: none; color: white; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .lb-nav:hover { background: rgba(255,255,255,0.22); }
+    .lb-prev { left: 12px; }
+    .lb-next { right: 12px; }
+    .lb-info { margin-top: 14px; text-align: center; }
+    .lb-caption { font-size: 0.9rem; color: rgba(255,255,255,0.85); }
+    .lb-meta { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 3px; }
 
-    .lightbox-img-wrap {
-      position: relative;
-      max-width: 90vw;
-      max-height: 78vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .lightbox-img-wrap img {
-      max-width: 90vw;
-      max-height: 78vh;
-      object-fit: contain;
-      border-radius: 10px;
-      box-shadow: 0 20px 80px rgba(0,0,0,0.5);
-      animation: lbIn 0.2s ease;
-    }
-    @keyframes lbIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to   { opacity: 1; transform: scale(1); }
-    }
+    /* ── Footer ── */
+    footer { text-align: center; padding: 28px 20px 72px; color: var(--ink-lt); font-size: 0.8rem; }
 
-    .lightbox-close {
-      position: fixed;
-      top: 20px;
-      right: 24px;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.12);
-      border: none;
-      color: white;
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(8px);
-      transition: background var(--transition);
-    }
-    .lightbox-close:hover { background: rgba(255,255,255,0.2); }
+    /* ── Spinner ── */
+    .spinner { width: 32px; height: 32px; border: 3px solid rgba(0,0,0,0.08); border-top-color: var(--coral); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 48px auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    .lightbox-nav {
-      position: fixed;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.12);
-      border: none;
-      color: white;
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(8px);
-      transition: background var(--transition);
-    }
-    .lightbox-nav:hover { background: rgba(255,255,255,0.22); }
-    .lightbox-prev { left: 16px; }
-    .lightbox-next { right: 16px; }
-
-    .lightbox-info {
-      margin-top: 16px;
-      text-align: center;
-      color: rgba(255,255,255,0.85);
-    }
-    .lightbox-caption {
-      font-size: 0.95rem;
-      margin-bottom: 4px;
-    }
-    .lightbox-meta {
-      font-size: 0.78rem;
-      color: rgba(255,255,255,0.45);
-    }
-
-    /* ── Admin Login ──────────────────────────────────────────── */
-    .admin-lock {
-      position: fixed;
-      bottom: 20px;
-      left: 24px;
-      font-size: 1.1rem;
-      opacity: 0.25;
-      cursor: pointer;
-      transition: opacity var(--transition);
-      background: none;
-      border: none;
-      color: var(--ink);
-      padding: 6px;
-    }
-    .admin-lock:hover { opacity: 0.6; }
-    body.admin-mode .admin-lock { opacity: 0.7; color: var(--coral); }
-
-    /* ── Footer ──────────────────────────────────────────────── */
-    footer {
-      text-align: center;
-      padding: 32px 24px 80px;
-      color: var(--ink-lt);
-      font-size: 0.82rem;
-    }
-    footer a { color: var(--coral); text-decoration: none; }
-
-    /* ── Mobile ───────────────────────────────────────────────── */
+    /* ── Mobile ── */
     @media (max-width: 768px) {
-      header { height: 52px; padding: 0 16px; }
-      .logo { font-size: 1.25rem; }
-      .hero { padding: 28px 16px 20px; }
-      .hero-title { font-size: clamp(2.2rem, 10vw, 3.5rem); }
-      .hero-tagline { font-size: 0.78rem; letter-spacing: 0.1em; }
-      .tabs-wrapper { top: 52px; padding: 10px 14px 8px; }
-      .tab { padding: 8px 14px; font-size: 0.82rem; min-height: 38px; touch-action: manipulation; }
-      .add-category-btn { padding: 8px 12px; font-size: 0.82rem; }
-      .gallery-section { padding: 14px 10px 48px; }
-      .gallery-grid { column-gap: 10px; }
+      :root { --hdr: 52px; --nav: 42px; }
+      .logo { font-size: 1.2rem; }
+      .hero { padding: 24px 14px 20px; }
+      .hero-title { font-size: clamp(2rem, 9vw, 3rem); }
+      .hero-tagline { font-size: 0.75rem; }
+      .cat-tabs-wrap { padding: 8px 12px 6px; }
+      .cat-tab { padding: 6px 12px; font-size: 0.8rem; min-height: 34px; }
+      .gallery-section { padding: 12px 10px 48px; }
+      .gallery-grid { columns: 2; column-gap: 10px; }
       .gallery-item { margin-bottom: 10px; border-radius: 10px; }
-      .img-footer { padding: 6px 10px 8px; }
-      .img-caption { font-size: 0.75rem; }
-      .upload-fab { bottom: 16px; right: 14px; width: 52px; height: 52px; font-size: 22px; }
-      .admin-lock { bottom: 16px; left: 16px; }
-      .modal { padding: 20px 18px; border-radius: 16px; max-height: 88vh; overflow-y: auto; }
-      .modal-title { font-size: 1.2rem; margin-bottom: 16px; }
-      .drop-zone { padding: 22px 16px; }
-      .drop-zone-icon { font-size: 1.6rem; }
-      .drop-zone-text { font-size: 0.82rem; }
-      .btn { padding: 12px 16px; font-size: 0.9rem; min-height: 44px; touch-action: manipulation; }
-      .lightbox-nav { width: 36px; height: 36px; font-size: 18px; }
-      .lightbox-prev { left: 8px; }
-      .lightbox-next { right: 8px; }
-      .lightbox-img-wrap img { max-height: 70vh; }
-      footer { padding: 24px 16px 64px; }
+      .inner-page { padding: 24px 16px 60px; }
+      .about-layout { gap: 24px; }
+      .about-photo-wrap { max-width: 160px; margin: 0 auto; }
+      .pricing-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .order-photos-grid { columns: 2; column-gap: 10px; }
+      .modal { padding: 18px 16px; border-radius: 16px; }
+      .upload-fab { bottom: 14px; right: 14px; width: 48px; height: 48px; font-size: 22px; }
+      .admin-lock { bottom: 14px; left: 14px; }
+      footer { padding: 20px 16px 60px; }
     }
-    @media (max-width: 380px) {
-      .hero-title { font-size: 2rem; }
+    @media (max-width: 400px) {
+      .pricing-grid { grid-template-columns: 1fr; }
       .gallery-grid { column-gap: 8px; }
     }
-
-    /* ── Loading spinner ──────────────────────────────────────── */
-    .spinner {
-      width: 36px;
-      height: 36px;
-      border: 3px solid rgba(0,0,0,0.08);
-      border-top-color: var(--coral);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      margin: 60px auto;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
-<!-- ── Header ──────────────────────────────────────────────── -->
+<!-- Header -->
 <header>
-  <a class="logo" href="/">studio<span class="dot">.</span><span>bylilly</span></a>
-  <div class="header-actions">
+  <a class="logo" href="/">studio<span class="dot">.</span><span class="lilly">bylilly</span></a>
+  <div style="display:flex;align-items:center;gap:8px">
     <span class="admin-badge">Admin</span>
   </div>
 </header>
 
-<!-- ── Hero ────────────────────────────────────────────────── -->
-<section class="hero">
-  <h1 class="hero-title">
-    <span class="studio">studio</span><span class="dot">.</span>
-    <span class="bylilly">by lilly</span>
-  </h1>
-  <p class="hero-tagline" id="hero-tagline">handmade with love</p>
-  <div class="hero-dots">
-    <div class="hero-dot" style="background:var(--coral)"></div>
-    <div class="hero-dot" style="background:var(--lavender)"></div>
-    <div class="hero-dot" style="background:var(--sage)"></div>
-    <div class="hero-dot" style="background:var(--gold)"></div>
-    <div class="hero-dot" style="background:var(--pink)"></div>
-  </div>
-</section>
+<!-- Page Nav -->
+<nav class="page-nav" id="page-nav">
+  <button class="page-tab active" data-page="gallery" onclick="showPage('gallery')">Gallery</button>
+  <button class="page-tab" data-page="about" onclick="showPage('about')">About</button>
+  <button class="page-tab" data-page="pricing" onclick="showPage('pricing')">Pricing</button>
+  <button class="page-tab" data-page="order" onclick="showPage('order')">Order with Me</button>
+</nav>
 
-<!-- ── Category Tabs ─────────────────────────────────────── -->
-<div class="tabs-wrapper">
-  <div class="tabs-scroll" id="tabs-scroll">
-    <button class="tab tab-all active" data-cat="all" onclick="selectTab('all')">All</button>
-    <!-- dynamic tabs injected here -->
-    <button class="add-category-btn" onclick="openAddCategoryModal()">＋ Add Category</button>
+<!-- ═══ GALLERY PAGE ═══ -->
+<div id="page-gallery">
+  <section class="hero">
+    <h1 class="hero-title"><span>studio</span><span class="dot">.</span><span class="bylilly">by lilly</span></h1>
+    <p class="hero-tagline" id="hero-tagline">handmade with love</p>
+    <div class="hero-dots">
+      <div class="hero-dot" style="background:var(--coral)"></div>
+      <div class="hero-dot" style="background:var(--lavender)"></div>
+      <div class="hero-dot" style="background:var(--sage)"></div>
+      <div class="hero-dot" style="background:var(--gold)"></div>
+      <div class="hero-dot" style="background:var(--pink)"></div>
+    </div>
+  </section>
+  <div class="cat-tabs-wrap">
+    <div class="cat-tabs-scroll" id="cat-tabs-scroll">
+      <button class="cat-tab cat-tab-all cat-active" data-cat="all" onclick="selectCat('all')">All</button>
+      <button class="add-cat-btn" onclick="openAddCatModal()">＋ Add Category</button>
+    </div>
+  </div>
+  <main class="gallery-section">
+    <div id="gallery-container"><div class="spinner"></div></div>
+  </main>
+</div>
+
+<!-- ═══ ABOUT PAGE ═══ -->
+<div id="page-about" style="display:none">
+  <div class="inner-page">
+    <div class="page-header">
+      <h1>About the Artist</h1>
+    </div>
+    <div class="about-layout">
+      <div class="about-photo-wrap">
+        <div id="about-photo-container">
+          <div class="about-photo-placeholder">🎨</div>
+        </div>
+        <button class="about-photo-upload-btn" title="Change photo">
+          ✏️
+          <input type="file" accept="image/*" onchange="uploadAboutPhoto(this.files[0])">
+        </button>
+      </div>
+      <div>
+        <div id="about-bio-display">
+          <p class="about-bio about-bio-empty">No bio yet — click Edit Bio to add one.</p>
+        </div>
+        <div id="about-bio-edit-wrap" style="display:none">
+          <textarea class="about-bio-edit" id="about-bio-textarea" placeholder="Write a bio about the artist..."></textarea>
+          <div class="about-save-row">
+            <button class="btn btn-secondary btn-sm" onclick="cancelAboutEdit()">Cancel</button>
+            <button class="btn btn-primary btn-sm" onclick="saveAbout()">Save</button>
+          </div>
+        </div>
+        <button class="edit-btn" onclick="editAbout()">✏️ Edit Bio</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- ── Gallery ───────────────────────────────────────────── -->
-<main class="gallery-section">
-  <div id="gallery-container">
-    <div class="spinner"></div>
+<!-- ═══ PRICING PAGE ═══ -->
+<div id="page-pricing" style="display:none">
+  <div class="inner-page">
+    <div class="page-header">
+      <h1>Pricing</h1>
+      <p>All prices are for original work. Commissions may vary — <a href="#" onclick="showPage('order');return false;" style="color:var(--coral);text-decoration:none">reach out</a> for a custom quote.</p>
+    </div>
+    <div class="pricing-grid" id="pricing-grid"></div>
+    <div id="pricing-empty" class="pricing-empty" style="display:none">No pricing added yet.</div>
+    <button class="add-pricing-btn" onclick="openAddPricingModal()">＋ Add Item</button>
   </div>
-</main>
+</div>
 
-<!-- ── Upload FAB ────────────────────────────────────────── -->
-<button class="upload-fab" onclick="openUploadModal()" title="Upload Art">＋</button>
+<!-- ═══ ORDER WITH ME PAGE ═══ -->
+<div id="page-order" style="display:none">
+  <div class="inner-page">
+    <div class="page-header">
+      <h1>Order with Me</h1>
+    </div>
+    <div class="order-contact-card">
+      <div class="order-contact-icon">✉️</div>
+      <div class="order-heading" id="order-heading">Let's create something together</div>
+      <p class="order-blurb" id="order-blurb">Interested in a commission? I'd love to hear about your ideas. Send me an email and we can work out the details.</p>
+      <a class="order-email-btn" id="order-email-btn" href="mailto:">📧 Send me an email</a>
+      <div class="order-extras" id="order-extras" style="display:none"></div>
+      <button class="edit-btn" onclick="openEditOrderModal()">✏️ Edit Contact Info</button>
+    </div>
 
-<!-- ── Admin Lock ────────────────────────────────────────── -->
-<button class="admin-lock" id="admin-lock-btn" onclick="handleAdminLockClick()" title="Admin">🔒</button>
+    <div id="order-photos-section">
+      <p class="order-photos-heading">Inspiration & Past Work</p>
+      <button class="upload-order-photo-btn" onclick="openOrderPhotoUpload()">＋ Add Photo</button>
+      <div class="order-photos-grid" id="order-photos-grid"></div>
+      <div id="order-photos-empty" style="display:none;text-align:center;padding:32px;color:var(--ink-lt);font-style:italic">No photos yet.</div>
+    </div>
+  </div>
+</div>
 
-<!-- ── Footer ────────────────────────────────────────────── -->
-<footer>
-  <p>© 2025 studio.bylilly · all art by lilly</p>
-</footer>
+<!-- Upload FAB (gallery page) -->
+<button class="upload-fab" id="upload-fab" onclick="openUploadModal()" title="Upload Art">＋</button>
 
-<!-- ── MODALS ─────────────────────────────────────────────── -->
+<!-- Admin lock -->
+<button class="admin-lock" id="admin-lock-btn" onclick="handleAdminLock()">🔒</button>
 
-<!-- Admin Login Modal -->
+<footer><p>© 2025 studio.bylilly · all art by lilly</p></footer>
+
+<!-- ══ MODALS ══ -->
+
+<!-- Admin login -->
 <div class="modal-backdrop" id="modal-admin">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('modal-admin')">✕</button>
-    <div id="admin-modal-content">
+    <div id="admin-login-panel">
       <h2 class="modal-title">Admin Access</h2>
       <div class="form-group">
         <label class="form-label">Password</label>
-        <input class="form-input" type="password" id="admin-password-input" placeholder="Enter password" onkeydown="if(event.key==='Enter')submitAdminLogin()">
-        <div class="form-error" id="admin-login-error" style="display:none"></div>
+        <input class="form-input" type="password" id="admin-pw" placeholder="Enter password" onkeydown="if(event.key==='Enter')doAdminLogin()">
+        <div class="form-error" id="admin-err" style="display:none">Wrong password.</div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="closeModal('modal-admin')">Cancel</button>
-        <button class="btn btn-primary" onclick="submitAdminLogin()">Login</button>
+        <button class="btn btn-primary" onclick="doAdminLogin()">Login</button>
       </div>
     </div>
-    <div id="admin-logout-content" style="display:none">
+    <div id="admin-logout-panel" style="display:none">
       <h2 class="modal-title">Admin Panel</h2>
-      <p style="color:var(--ink-lt);margin-bottom:20px;font-size:0.9rem">You're logged in as admin. You can upload art, add/delete categories, and remove images.</p>
+      <p style="color:var(--ink-lt);font-size:0.88rem;margin-bottom:18px;line-height:1.55">You're logged in. You can edit all pages, upload images, manage categories and pricing.</p>
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="closeModal('modal-admin')">Close</button>
-        <button class="btn btn-primary" style="background:#e74c3c" onclick="adminLogout()">Log Out</button>
+        <button class="btn btn-primary" style="background:#e74c3c" onclick="doAdminLogout()">Log Out</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Add Category Modal -->
-<div class="modal-backdrop" id="modal-add-category">
+<!-- Add Category -->
+<div class="modal-backdrop" id="modal-add-cat">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-add-category')">✕</button>
+    <button class="modal-close" onclick="closeModal('modal-add-cat')">✕</button>
     <h2 class="modal-title">New Category</h2>
     <div class="form-group">
-      <label class="form-label">Category Name</label>
-      <input class="form-input" type="text" id="cat-name-input" placeholder="e.g. Ceramics" onkeydown="if(event.key==='Enter')submitAddCategory()">
-      <div class="form-error" id="cat-error" style="display:none"></div>
+      <label class="form-label">Name</label>
+      <input class="form-input" type="text" id="cat-name" placeholder="e.g. Ceramics" onkeydown="if(event.key==='Enter')doAddCat()">
+      <div class="form-error" id="cat-err" style="display:none"></div>
     </div>
     <div class="form-group">
       <label class="form-label">Color</label>
-      <div class="color-swatches" id="color-swatches">
-        <!-- injected by JS -->
-      </div>
+      <div class="color-swatches" id="color-swatches"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('modal-add-category')">Cancel</button>
-      <button class="btn btn-primary" onclick="submitAddCategory()">Create</button>
+      <button class="btn btn-secondary" onclick="closeModal('modal-add-cat')">Cancel</button>
+      <button class="btn btn-primary" onclick="doAddCat()">Create</button>
     </div>
   </div>
 </div>
 
-<!-- Upload Art Modal -->
+<!-- Upload Art (gallery) -->
 <div class="modal-backdrop" id="modal-upload">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('modal-upload')">✕</button>
     <h2 class="modal-title">Upload Art</h2>
     <div class="form-group">
       <label class="form-label">Category</label>
-      <select class="form-input" id="upload-category-select">
-        <!-- populated dynamically -->
-      </select>
+      <select class="form-input" id="upload-cat-select"></select>
     </div>
     <div class="form-group">
       <label class="form-label">Images</label>
-      <div class="drop-zone" id="drop-zone">
-        <input type="file" id="upload-file-input" accept="image/*" multiple onchange="handleFileSelect(this.files)">
-        <div class="drop-zone-icon">🖼️</div>
-        <div class="drop-zone-text">Drag & drop images here or tap to browse</div>
-        <div class="drop-zone-preview" id="drop-zone-preview"></div>
+      <div class="drop-zone" id="dz-gallery">
+        <input type="file" id="upload-file-input" accept="image/*" multiple onchange="handleFiles(this.files,'gallery')">
+        <div class="dz-icon">🖼️</div>
+        <div class="dz-text">Drag & drop or tap to select</div>
+        <div class="dz-preview" id="dz-gallery-preview"></div>
       </div>
     </div>
     <div class="form-group">
       <label class="form-label">Caption (optional)</label>
-      <input class="form-input" type="text" id="upload-caption" placeholder="Add a caption for all uploaded images...">
+      <input class="form-input" type="text" id="upload-caption" placeholder="Short description...">
     </div>
-    <div class="upload-progress" id="upload-progress" style="display:none">
-      <div class="upload-progress-bar" id="upload-progress-bar"></div>
-    </div>
-    <div class="form-error" id="upload-error" style="display:none"></div>
+    <div class="upload-bar" id="upload-bar" style="display:none"><div class="upload-bar-fill" id="upload-bar-fill"></div></div>
+    <div class="form-error" id="upload-err" style="display:none"></div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modal-upload')">Cancel</button>
-      <button class="btn btn-primary" id="upload-submit-btn" onclick="submitUpload()">Upload</button>
+      <button class="btn btn-primary" id="upload-submit" onclick="doUploadGallery()">Upload</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add / Edit Pricing -->
+<div class="modal-backdrop" id="modal-pricing">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-pricing')">✕</button>
+    <h2 class="modal-title" id="pricing-modal-title">Add Pricing</h2>
+    <input type="hidden" id="pricing-edit-id">
+    <div class="form-group">
+      <label class="form-label">Title</label>
+      <input class="form-input" type="text" id="pricing-title" placeholder="e.g. Original painting 8×10">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Price</label>
+      <input class="form-input" type="text" id="pricing-price" placeholder="e.g. $120">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description (optional)</label>
+      <input class="form-input" type="text" id="pricing-desc" placeholder="e.g. Oil on canvas, unframed">
+    </div>
+    <div class="form-error" id="pricing-err" style="display:none"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-pricing')">Cancel</button>
+      <button class="btn btn-primary" onclick="doSavePricing()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Order/Contact Info -->
+<div class="modal-backdrop" id="modal-order-edit">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-order-edit')">✕</button>
+    <h2 class="modal-title">Edit Contact Info</h2>
+    <div class="form-group">
+      <label class="form-label">Your Email</label>
+      <input class="form-input" type="email" id="order-email-input" placeholder="you@example.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Commission Blurb</label>
+      <textarea class="form-input" id="order-blurb-input" placeholder="Tell visitors about commissions..." rows="4"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Extra Info (optional)</label>
+      <textarea class="form-input" id="order-extras-input" placeholder="Instagram: @handle&#10;Turnaround: 4–6 weeks&#10;Accepts: Venmo, PayPal" rows="4"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-order-edit')">Cancel</button>
+      <button class="btn btn-primary" onclick="doSaveOrderInfo()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Upload Order Photo -->
+<div class="modal-backdrop" id="modal-order-photo">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-order-photo')">✕</button>
+    <h2 class="modal-title">Add Photo</h2>
+    <div class="form-group">
+      <div class="drop-zone" id="dz-order">
+        <input type="file" id="order-photo-input" accept="image/*" multiple onchange="handleFiles(this.files,'order')">
+        <div class="dz-icon">🖼️</div>
+        <div class="dz-text">Tap to select photos</div>
+        <div class="dz-preview" id="dz-order-preview"></div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Caption (optional)</label>
+      <input class="form-input" type="text" id="order-photo-caption" placeholder="e.g. Custom portrait commission">
+    </div>
+    <div class="upload-bar" id="order-bar" style="display:none"><div class="upload-bar-fill" id="order-bar-fill"></div></div>
+    <div class="form-error" id="order-photo-err" style="display:none"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-order-photo')">Cancel</button>
+      <button class="btn btn-primary" id="order-photo-submit" onclick="doUploadOrderPhotos()">Upload</button>
     </div>
   </div>
 </div>
 
 <!-- Lightbox -->
-<div class="lightbox" id="lightbox" onclick="closeLightboxOutside(event)">
-  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
-  <button class="lightbox-nav lightbox-prev" onclick="lightboxNav(-1)">‹</button>
-  <button class="lightbox-nav lightbox-next" onclick="lightboxNav(1)">›</button>
-  <div class="lightbox-img-wrap">
-    <img id="lightbox-img" src="" alt="">
-  </div>
-  <div class="lightbox-info">
-    <div class="lightbox-caption" id="lightbox-caption"></div>
-    <div class="lightbox-meta" id="lightbox-meta"></div>
+<div class="lightbox" id="lightbox" onclick="lbOutside(event)">
+  <button class="lb-close" onclick="closeLb()">✕</button>
+  <button class="lb-nav lb-prev" onclick="lbNav(-1)">‹</button>
+  <button class="lb-nav lb-next" onclick="lbNav(1)">›</button>
+  <div class="lightbox-img-wrap"><img id="lb-img" src="" alt=""></div>
+  <div class="lb-info">
+    <div class="lb-caption" id="lb-caption"></div>
+    <div class="lb-meta" id="lb-meta"></div>
   </div>
 </div>
 
 <script>
 // ── State ──────────────────────────────────────────────────────────────────────
-let categories = [];
-let allImages = [];
-let currentImages = []; // images in current view (for lightbox nav)
-let currentLightboxIdx = 0;
-let activeCategory = 'all';
+let categories = [], allImages = [], pricing = [], orderPhotos = [], content = {};
+let currentPage = 'gallery';
+let activeCat = 'all';
+let currentImages = [], lbIdx = 0;
 let adminToken = localStorage.getItem('lily_admin_token') || null;
-let selectedFiles = [];
+let selectedFiles = { gallery: [], order: [] };
 let selectedColor = '#e88c7d';
-let pendingDeleteCatId = null;
 
-const PRESET_COLORS = [
-  { name: 'Coral',    hex: '#e88c7d' },
-  { name: 'Lavender', hex: '#9b8fe8' },
-  { name: 'Sage',     hex: '#72c4a0' },
-  { name: 'Gold',     hex: '#f0c040' },
-  { name: 'Pink',     hex: '#f0a5c0' },
-  { name: 'Sky',      hex: '#7ec8e3' },
-  { name: 'Peach',    hex: '#f5b88a' },
-  { name: 'Teal',     hex: '#5bbcb0' },
+const COLORS = [
+  { name:'Coral',    hex:'#e88c7d' }, { name:'Lavender', hex:'#9b8fe8' },
+  { name:'Sage',     hex:'#72c4a0' }, { name:'Gold',     hex:'#f0c040' },
+  { name:'Pink',     hex:'#f0a5c0' }, { name:'Sky',      hex:'#7ec8e3' },
+  { name:'Peach',    hex:'#f5b88a' }, { name:'Teal',     hex:'#5bbcb0' },
 ];
-
-const TAGLINES = [
-  'handmade with love',
-  'art from the heart',
-  'creating every day',
-  'color + texture + soul',
-  'ceramics · painting · drawing',
-];
+const TAGLINES = ['handmade with love','art from the heart','creating every day','color + texture + soul','ceramics · painting · drawing'];
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  // Rotating tagline
-  let taglineIdx = 0;
-  const taglineEl = document.getElementById('hero-tagline');
-  setInterval(() => {
-    taglineIdx = (taglineIdx + 1) % TAGLINES.length;
-    taglineEl.style.opacity = 0;
-    setTimeout(() => {
-      taglineEl.textContent = TAGLINES[taglineIdx];
-      taglineEl.style.opacity = 1;
-    }, 300);
-  }, 3500);
-  taglineEl.style.transition = 'opacity 0.3s ease';
-
-  // Color swatches
+  if (adminToken) document.body.classList.add('admin-mode');
   buildColorSwatches();
 
-  // Check admin session
-  if (adminToken) {
-    document.body.classList.add('admin-mode');
-  }
+  // Rotating tagline
+  const tel = document.getElementById('hero-tagline');
+  let ti = 0;
+  setInterval(() => {
+    ti = (ti + 1) % TAGLINES.length;
+    tel.style.opacity = 0;
+    setTimeout(() => { tel.textContent = TAGLINES[ti]; tel.style.opacity = 1; }, 300);
+  }, 3500);
 
-  // Load data
-  loadAll();
-
-  // Drag-drop on drop zone
-  const dz = document.getElementById('drop-zone');
-  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
-  dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
-  dz.addEventListener('drop', e => {
-    e.preventDefault();
-    dz.classList.remove('dragover');
-    handleFileSelect(e.dataTransfer.files);
+  // Drag-drop
+  ['dz-gallery','dz-order'].forEach(id => {
+    const dz = document.getElementById(id);
+    if (!dz) return;
+    const type = id === 'dz-gallery' ? 'gallery' : 'order';
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+    dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('dragover'); handleFiles(e.dataTransfer.files, type); });
   });
 
-  // Keyboard nav for lightbox
+  // Keyboard lightbox
   document.addEventListener('keydown', e => {
     if (!document.getElementById('lightbox').classList.contains('open')) return;
-    if (e.key === 'Escape') closeLightbox();
-    if (e.key === 'ArrowLeft') lightboxNav(-1);
-    if (e.key === 'ArrowRight') lightboxNav(1);
+    if (e.key === 'Escape') closeLb();
+    if (e.key === 'ArrowLeft') lbNav(-1);
+    if (e.key === 'ArrowRight') lbNav(1);
   });
-});
 
-// ── API helpers ───────────────────────────────────────────────────────────────
-async function api(method, url, body) {
-  const opts = {
-    method,
-    headers: { 'Content-Type': 'application/json' },
-  };
-  if (adminToken) opts.headers['Authorization'] = `Bearer ${adminToken}`;
-  if (body) opts.body = JSON.stringify(body);
-  const res = await fetch(url, opts);
-  return res.json();
-}
+  loadAll();
+});
 
 // ── Load ──────────────────────────────────────────────────────────────────────
 async function loadAll() {
-  const [cats, imgs] = await Promise.all([
+  const [cats, imgs, pr, op, ct] = await Promise.all([
     fetch('/api/categories').then(r => r.json()),
     fetch('/api/images').then(r => r.json()),
+    fetch('/api/pricing').then(r => r.json()),
+    fetch('/api/order-photos').then(r => r.json()),
+    fetch('/api/content').then(r => r.json()),
   ]);
-  categories = cats;
-  allImages = imgs;
-  renderTabs();
-  renderGallery();
+  categories = cats; allImages = imgs; pricing = pr; orderPhotos = op; content = ct;
+  renderTabs(); renderGallery(); renderAbout(); renderPricing(); renderOrderPage();
 }
 
-function getCategoryById(id) {
-  return categories.find(c => c.id === id) || null;
+// ── Page Nav ──────────────────────────────────────────────────────────────────
+function showPage(page) {
+  currentPage = page;
+  ['gallery','about','pricing','order'].forEach(p => {
+    document.getElementById('page-' + p).style.display = p === page ? '' : 'none';
+  });
+  document.querySelectorAll('.page-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.page === page);
+  });
+  // FAB only on gallery
+  document.getElementById('upload-fab').style.display =
+    (page === 'gallery' && adminToken) ? 'flex' : 'none';
+  window.scrollTo(0, 0);
 }
 
-// ── Tabs ──────────────────────────────────────────────────────────────────────
+// ── Category Tabs ─────────────────────────────────────────────────────────────
 function renderTabs() {
-  const scroll = document.getElementById('tabs-scroll');
-  // Remove dynamic tabs (keep "All" tab and "Add Category" btn)
-  scroll.querySelectorAll('.tab:not(.tab-all), .tab-separator').forEach(el => el.remove());
-
-  const addBtn = scroll.querySelector('.add-category-btn');
-
+  const scroll = document.getElementById('cat-tabs-scroll');
+  scroll.querySelectorAll('.cat-tab:not(.cat-tab-all)').forEach(e => e.remove());
+  const addBtn = scroll.querySelector('.add-cat-btn');
   categories.forEach(cat => {
     const btn = document.createElement('button');
-    btn.className = 'tab' + (activeCategory === cat.id ? ' active' : '');
+    btn.className = 'cat-tab' + (activeCat === cat.id ? ' cat-active' : '');
     btn.dataset.cat = cat.id;
-    btn.style.background = activeCategory === cat.id ? cat.color : '';
-    btn.style.borderColor = activeCategory === cat.id ? cat.color : '';
-    btn.style.color = activeCategory === cat.id ? 'white' : cat.color;
-    btn.innerHTML = `${cat.name}
-      <button class="tab-delete-btn" onclick="event.stopPropagation();deleteCategoryConfirm(${cat.id},'${cat.name.replace(/'/g,"\\'")}')">✕</button>`;
-    btn.addEventListener('click', () => selectTab(cat.id));
+    btn.style.cssText = activeCat === cat.id
+      ? `background:${cat.color};border-color:${cat.color};color:white`
+      : `color:${cat.color};border-color:rgba(0,0,0,0.1)`;
+    btn.innerHTML = `${esc(cat.name)}<button class="cat-delete-btn" onclick="event.stopPropagation();delCat(${cat.id},'${cat.name.replace(/'/g,"\\'")}')">✕</button>`;
+    btn.addEventListener('click', () => selectCat(cat.id));
     scroll.insertBefore(btn, addBtn);
   });
-
-  // Update "All" tab styles
-  const allTab = scroll.querySelector('.tab-all');
-  if (activeCategory === 'all') {
-    allTab.classList.add('active');
-  } else {
-    allTab.classList.remove('active');
-  }
+  const allTab = scroll.querySelector('.cat-tab-all');
+  allTab.classList.toggle('cat-active', activeCat === 'all');
 }
 
-function selectTab(catId) {
-  activeCategory = catId;
-  // Update tab visuals
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  const clicked = document.querySelector(`.tab[data-cat="${catId}"]`);
-  if (clicked) clicked.classList.add('active');
-
-  categories.forEach(cat => {
-    const t = document.querySelector(`.tab[data-cat="${cat.id}"]`);
-    if (!t) return;
-    if (cat.id === catId) {
-      t.style.background = cat.color;
-      t.style.borderColor = cat.color;
-      t.style.color = 'white';
-    } else {
-      t.style.background = '';
-      t.style.borderColor = '';
-      t.style.color = cat.color;
-    }
+function selectCat(id) {
+  activeCat = id;
+  document.querySelectorAll('.cat-tab').forEach(t => {
+    t.classList.remove('cat-active');
+    t.style.cssText = '';
   });
-
+  const t = document.querySelector(`.cat-tab[data-cat="${id}"]`);
+  if (t) {
+    t.classList.add('cat-active');
+    const cat = categories.find(c => c.id === id);
+    if (cat) t.style.cssText = `background:${cat.color};border-color:${cat.color};color:white`;
+  } else {
+    document.querySelector('.cat-tab-all').classList.add('cat-active');
+  }
   renderGallery();
 }
 
 // ── Gallery ───────────────────────────────────────────────────────────────────
 function renderGallery() {
   const container = document.getElementById('gallery-container');
-
-  const imgs = activeCategory === 'all'
-    ? allImages
-    : allImages.filter(i => i.category_id === activeCategory);
-
+  const imgs = activeCat === 'all' ? allImages : allImages.filter(i => i.category_id === activeCat);
   currentImages = imgs;
 
   if (!imgs.length) {
-    container.innerHTML = `
-      <div class="gallery-empty">
-        <div class="empty-icon">${activeCategory === 'all' ? '🎨' : '✨'}</div>
-        <p>${activeCategory === 'all' ? 'No art uploaded yet.' : 'Nothing in this category yet.'}</p>
-        ${adminToken ? '<p style="margin-top:8px;font-size:0.85rem;color:var(--ink-lt)">Tap the + button to upload!</p>' : ''}
-      </div>`;
+    container.innerHTML = `<div class="gallery-empty"><div class="ei">${activeCat === 'all' ? '🎨' : '✨'}</div><p>${activeCat === 'all' ? 'No art uploaded yet.' : 'Nothing here yet.'}</p>${adminToken ? '<p style="margin-top:6px;font-size:0.82rem;color:var(--ink-lt)">Tap + to upload!</p>' : ''}</div>`;
     return;
   }
 
   const grid = document.createElement('div');
   grid.className = 'gallery-grid';
-
   imgs.forEach((img, idx) => {
-    const cat = getCategoryById(img.category_id);
+    const cat = categories.find(c => c.id === img.category_id);
     const item = document.createElement('div');
     item.className = 'gallery-item';
     item.innerHTML = `
       <div class="img-wrap">
-        <img src="/uploads/${img.filename}" alt="${escHtml(img.caption || img.original_name)}" loading="lazy">
-        ${cat && activeCategory === 'all' ? `<div class="img-category-chip" style="background:${cat.color}">${escHtml(cat.name)}</div>` : ''}
-        <button class="img-delete-btn" onclick="event.stopPropagation();deleteImage(${img.id})" title="Delete">✕</button>
+        <img src="/uploads/${img.filename}" alt="${esc(img.caption || img.original_name)}" loading="lazy">
+        ${cat && activeCat === 'all' ? `<div class="img-cat-chip" style="background:${cat.color}">${esc(cat.name)}</div>` : ''}
+        <button class="img-del-btn" onclick="event.stopPropagation();delImage(${img.id})">✕</button>
       </div>
-      ${img.caption ? `<div class="img-footer"><p class="img-caption">${escHtml(img.caption)}</p></div>` : ''}
-    `;
-    item.addEventListener('click', () => openLightbox(idx));
+      ${img.caption ? `<div class="img-footer"><p class="img-caption">${esc(img.caption)}</p></div>` : ''}`;
+    item.addEventListener('click', () => openLb(idx));
     grid.appendChild(item);
   });
 
@@ -1087,263 +857,406 @@ function renderGallery() {
 }
 
 // ── Lightbox ──────────────────────────────────────────────────────────────────
-function openLightbox(idx) {
-  currentLightboxIdx = idx;
-  const lb = document.getElementById('lightbox');
-  lb.classList.add('open');
+function openLb(idx) {
+  lbIdx = idx;
+  document.getElementById('lightbox').classList.add('open');
   document.body.style.overflow = 'hidden';
-  showLightboxImage(idx);
+  showLbImage();
 }
-
-function showLightboxImage(idx) {
-  const img = currentImages[idx];
+function showLbImage() {
+  const img = currentImages[lbIdx];
   if (!img) return;
-  const cat = getCategoryById(img.category_id);
-  document.getElementById('lightbox-img').src = `/uploads/${img.filename}`;
-  document.getElementById('lightbox-caption').textContent = img.caption || '';
-  document.getElementById('lightbox-meta').textContent =
-    [cat ? cat.name : '', img.original_name].filter(Boolean).join(' · ');
+  const cat = categories.find(c => c.id === img.category_id);
+  document.getElementById('lb-img').src = `/uploads/${img.filename}`;
+  document.getElementById('lb-caption').textContent = img.caption || '';
+  document.getElementById('lb-meta').textContent = [cat?.name, img.original_name].filter(Boolean).join(' · ');
 }
+function lbNav(dir) { lbIdx = (lbIdx + dir + currentImages.length) % currentImages.length; showLbImage(); }
+function closeLb() { document.getElementById('lightbox').classList.remove('open'); document.body.style.overflow = ''; }
+function lbOutside(e) { if (e.target === document.getElementById('lightbox')) closeLb(); }
 
-function lightboxNav(dir) {
-  currentLightboxIdx = (currentLightboxIdx + dir + currentImages.length) % currentImages.length;
-  showLightboxImage(currentLightboxIdx);
-}
-
-function closeLightbox() {
-  document.getElementById('lightbox').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-function closeLightboxOutside(e) {
-  if (e.target === document.getElementById('lightbox')) closeLightbox();
-}
-
-// ── Admin Auth ────────────────────────────────────────────────────────────────
-let lockClickCount = 0;
-let lockClickTimer = null;
-
-function handleAdminLockClick() {
-  if (adminToken) {
-    // Already logged in — show logout panel
-    showAdminModal(true);
-    return;
+// ── About Page ────────────────────────────────────────────────────────────────
+function renderAbout() {
+  // Photo
+  const photo = content.about_photo;
+  const photoContainer = document.getElementById('about-photo-container');
+  if (photo) {
+    photoContainer.innerHTML = `<img class="about-photo" src="/uploads/${photo}" alt="Lilly">`;
   }
-  openModal('modal-admin');
-  setTimeout(() => document.getElementById('admin-password-input').focus(), 100);
+  // Bio
+  const bio = content.about_text || '';
+  const display = document.getElementById('about-bio-display');
+  display.innerHTML = bio
+    ? `<p class="about-bio">${esc(bio).replace(/\n/g,'<br>')}</p>`
+    : `<p class="about-bio about-bio-empty">No bio yet — click Edit Bio to add one.</p>`;
 }
 
-function showAdminModal(loggedIn) {
-  document.getElementById('admin-modal-content').style.display = loggedIn ? 'none' : '';
-  document.getElementById('admin-logout-content').style.display = loggedIn ? '' : 'none';
-  openModal('modal-admin');
+function editAbout() {
+  document.getElementById('about-bio-textarea').value = content.about_text || '';
+  document.getElementById('about-bio-display').style.display = 'none';
+  document.getElementById('about-bio-edit-wrap').style.display = '';
+  document.querySelectorAll('.edit-btn').forEach(b => { if (b.onclick.toString().includes('editAbout')) b.style.display = 'none'; });
+}
+function cancelAboutEdit() {
+  document.getElementById('about-bio-edit-wrap').style.display = 'none';
+  document.getElementById('about-bio-display').style.display = '';
+  document.querySelectorAll('.edit-btn').forEach(b => b.style.display = adminToken ? '' : 'none');
+}
+async function saveAbout() {
+  const text = document.getElementById('about-bio-textarea').value;
+  await apiPost('/api/content/about_text', { value: text });
+  content.about_text = text;
+  renderAbout();
+  cancelAboutEdit();
 }
 
-async function submitAdminLogin() {
-  const pw = document.getElementById('admin-password-input').value;
-  const errEl = document.getElementById('admin-login-error');
-  errEl.style.display = 'none';
-  if (!pw) return;
-
-  const res = await fetch('/api/admin/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ password: pw }),
-  });
+async function uploadAboutPhoto(file) {
+  if (!file) return;
+  const fd = new FormData();
+  fd.append('photo', file);
+  const res = await fetch('/api/content/about-photo', { method: 'POST', headers: { Authorization: `Bearer ${adminToken}` }, body: fd });
   const data = await res.json();
-
-  if (data.error) {
-    errEl.textContent = 'Wrong password.';
-    errEl.style.display = '';
-    document.getElementById('admin-password-input').value = '';
-    return;
-  }
-
-  adminToken = data.token;
-  localStorage.setItem('lily_admin_token', adminToken);
-  document.body.classList.add('admin-mode');
-  document.getElementById('admin-lock-btn').title = 'Admin (logged in)';
-  closeModal('modal-admin');
-  document.getElementById('admin-password-input').value = '';
+  if (data.filename) { content.about_photo = data.filename; renderAbout(); }
 }
 
-async function adminLogout() {
-  if (adminToken) {
-    await fetch('/api/admin/logout', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${adminToken}` },
-    }).catch(() => {});
-  }
-  adminToken = null;
-  localStorage.removeItem('lily_admin_token');
-  document.body.classList.remove('admin-mode');
-  closeModal('modal-admin');
-  renderGallery(); // remove delete buttons
+// ── Pricing Page ──────────────────────────────────────────────────────────────
+function renderPricing() {
+  const grid = document.getElementById('pricing-grid');
+  const empty = document.getElementById('pricing-empty');
+  if (!pricing.length) { grid.innerHTML = ''; empty.style.display = ''; return; }
+  empty.style.display = 'none';
+  grid.innerHTML = pricing.map(p => `
+    <div class="price-card">
+      <div class="price-card-actions">
+        <button class="price-action-btn price-edit-btn" onclick="openEditPricingModal(${p.id})" title="Edit">✏️</button>
+        <button class="price-action-btn price-del-btn" onclick="delPricing(${p.id})" title="Delete">✕</button>
+      </div>
+      <div class="price-card-title">${esc(p.title)}</div>
+      ${p.description ? `<div class="price-card-desc">${esc(p.description)}</div>` : '<div class="price-card-desc"></div>'}
+      <div class="price-card-price">${esc(p.price)}</div>
+    </div>`).join('');
 }
 
-// ── Categories ────────────────────────────────────────────────────────────────
-function openAddCategoryModal() {
-  document.getElementById('cat-name-input').value = '';
-  document.getElementById('cat-error').style.display = 'none';
-  selectedColor = PRESET_COLORS[0].hex;
-  buildColorSwatches();
-  openModal('modal-add-category');
-  setTimeout(() => document.getElementById('cat-name-input').focus(), 100);
+function openAddPricingModal() {
+  document.getElementById('pricing-modal-title').textContent = 'Add Pricing';
+  document.getElementById('pricing-edit-id').value = '';
+  document.getElementById('pricing-title').value = '';
+  document.getElementById('pricing-price').value = '';
+  document.getElementById('pricing-desc').value = '';
+  document.getElementById('pricing-err').style.display = 'none';
+  openModal('modal-pricing');
+  setTimeout(() => document.getElementById('pricing-title').focus(), 100);
 }
 
-function buildColorSwatches() {
-  const container = document.getElementById('color-swatches');
-  if (!container) return;
-  container.innerHTML = '';
-  PRESET_COLORS.forEach(c => {
-    const sw = document.createElement('div');
-    sw.className = 'color-swatch' + (c.hex === selectedColor ? ' selected' : '');
-    sw.style.background = c.hex;
-    sw.title = c.name;
-    sw.onclick = () => {
-      selectedColor = c.hex;
-      container.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
-      sw.classList.add('selected');
-    };
-    container.appendChild(sw);
-  });
+function openEditPricingModal(id) {
+  const item = pricing.find(p => p.id === id);
+  if (!item) return;
+  document.getElementById('pricing-modal-title').textContent = 'Edit Pricing';
+  document.getElementById('pricing-edit-id').value = id;
+  document.getElementById('pricing-title').value = item.title;
+  document.getElementById('pricing-price').value = item.price;
+  document.getElementById('pricing-desc').value = item.description || '';
+  document.getElementById('pricing-err').style.display = 'none';
+  openModal('modal-pricing');
 }
 
-async function submitAddCategory() {
-  const name = document.getElementById('cat-name-input').value.trim();
-  const errEl = document.getElementById('cat-error');
+async function doSavePricing() {
+  const title = document.getElementById('pricing-title').value.trim();
+  const price = document.getElementById('pricing-price').value.trim();
+  const desc = document.getElementById('pricing-desc').value.trim();
+  const errEl = document.getElementById('pricing-err');
+  if (!title || !price) { errEl.textContent = 'Title and price are required.'; errEl.style.display = ''; return; }
   errEl.style.display = 'none';
-  if (!name) { errEl.textContent = 'Name required.'; errEl.style.display = ''; return; }
 
-  const res = await api('POST', '/api/categories', { name, color: selectedColor });
-  if (res.error) { errEl.textContent = res.error; errEl.style.display = ''; return; }
-
-  categories.push(res);
-  closeModal('modal-add-category');
-  renderTabs();
+  const editId = document.getElementById('pricing-edit-id').value;
+  if (editId) {
+    await apiJson('PATCH', `/api/pricing/${editId}`, { title, price, description: desc });
+    const idx = pricing.findIndex(p => p.id === Number(editId));
+    if (idx !== -1) pricing[idx] = { ...pricing[idx], title, price, description: desc };
+  } else {
+    const item = await apiJson('POST', '/api/pricing', { title, price, description: desc });
+    pricing.push(item);
+  }
+  renderPricing();
+  closeModal('modal-pricing');
 }
 
-async function deleteCategoryConfirm(id, name) {
-  if (!confirm(`Delete "${name}" and all its images? This can't be undone.`)) return;
-  await api('DELETE', `/api/categories/${id}`);
-  categories = categories.filter(c => c.id !== id);
-  allImages = allImages.filter(i => i.category_id !== id);
-  if (activeCategory === id) activeCategory = 'all';
-  renderTabs();
-  renderGallery();
+async function delPricing(id) {
+  if (!confirm('Delete this pricing item?')) return;
+  await apiJson('DELETE', `/api/pricing/${id}`);
+  pricing = pricing.filter(p => p.id !== id);
+  renderPricing();
 }
 
-// ── Upload ────────────────────────────────────────────────────────────────────
-function openUploadModal() {
-  selectedFiles = [];
-  document.getElementById('drop-zone-preview').innerHTML = '';
-  document.getElementById('upload-caption').value = '';
-  document.getElementById('upload-error').style.display = 'none';
-  document.getElementById('upload-progress').style.display = 'none';
-  document.getElementById('upload-progress-bar').style.width = '0%';
+// ── Order Page ────────────────────────────────────────────────────────────────
+function renderOrderPage() {
+  const email = content.contact_email || '';
+  const blurb = content.contact_blurb || 'Interested in a commission? I'd love to hear about your ideas. Send me an email and we can work out the details.';
+  const extras = content.contact_extras || '';
 
-  // Populate category select
-  const sel = document.getElementById('upload-category-select');
-  sel.innerHTML = categories.map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('');
-  if (activeCategory !== 'all') {
-    sel.value = activeCategory;
+  document.getElementById('order-blurb').textContent = blurb;
+
+  const emailBtn = document.getElementById('order-email-btn');
+  emailBtn.href = email ? `mailto:${email}` : '#';
+  emailBtn.textContent = email ? `📧 ${email}` : '📧 (no email set yet)';
+
+  const extrasEl = document.getElementById('order-extras');
+  if (extras) { extrasEl.textContent = extras; extrasEl.style.display = ''; }
+  else extrasEl.style.display = 'none';
+
+  // Order photos
+  const grid = document.getElementById('order-photos-grid');
+  const empty = document.getElementById('order-photos-empty');
+  if (!orderPhotos.length) { grid.innerHTML = ''; empty.style.display = ''; return; }
+  empty.style.display = 'none';
+  grid.innerHTML = orderPhotos.map(p => `
+    <div class="order-photo-item">
+      <img src="/uploads/${p.filename}" alt="${esc(p.caption || p.original_name)}" loading="lazy">
+      ${p.caption ? `<div class="order-photo-caption">${esc(p.caption)}</div>` : ''}
+      <button class="order-photo-del" onclick="delOrderPhoto(${p.id})">✕</button>
+    </div>`).join('');
+}
+
+function openEditOrderModal() {
+  document.getElementById('order-email-input').value = content.contact_email || '';
+  document.getElementById('order-blurb-input').value = content.contact_blurb || '';
+  document.getElementById('order-extras-input').value = content.contact_extras || '';
+  openModal('modal-order-edit');
+}
+
+async function doSaveOrderInfo() {
+  const email = document.getElementById('order-email-input').value.trim();
+  const blurb = document.getElementById('order-blurb-input').value.trim();
+  const extras = document.getElementById('order-extras-input').value.trim();
+  await Promise.all([
+    apiPost('/api/content/contact_email', { value: email }),
+    apiPost('/api/content/contact_blurb', { value: blurb }),
+    apiPost('/api/content/contact_extras', { value: extras }),
+  ]);
+  content.contact_email = email;
+  content.contact_blurb = blurb;
+  content.contact_extras = extras;
+  renderOrderPage();
+  closeModal('modal-order-edit');
+}
+
+function openOrderPhotoUpload() {
+  selectedFiles.order = [];
+  document.getElementById('dz-order-preview').innerHTML = '';
+  document.getElementById('order-photo-caption').value = '';
+  document.getElementById('order-photo-err').style.display = 'none';
+  document.getElementById('order-bar').style.display = 'none';
+  openModal('modal-order-photo');
+}
+
+async function doUploadOrderPhotos() {
+  const errEl = document.getElementById('order-photo-err');
+  if (!selectedFiles.order.length) { errEl.textContent = 'Select at least one photo.'; errEl.style.display = ''; return; }
+  const caption = document.getElementById('order-photo-caption').value.trim();
+  const btn = document.getElementById('order-photo-submit');
+  btn.disabled = true; btn.textContent = 'Uploading...';
+  const bar = document.getElementById('order-bar'); bar.style.display = '';
+  const fill = document.getElementById('order-bar-fill');
+  let done = 0;
+
+  for (const file of selectedFiles.order) {
+    const fd = new FormData();
+    fd.append('photo', file);
+    if (caption) fd.append('caption', caption);
+    try {
+      const res = await fetch('/api/order-photos', { method: 'POST', headers: { Authorization: `Bearer ${adminToken}` }, body: fd });
+      const data = await res.json();
+      if (!data.error) orderPhotos.unshift(data);
+    } catch(e) {}
+    done++;
+    fill.style.width = `${Math.round(done / selectedFiles.order.length * 100)}%`;
   }
 
+  renderOrderPage();
+  closeModal('modal-order-photo');
+  btn.disabled = false; btn.textContent = 'Upload';
+}
+
+async function delOrderPhoto(id) {
+  if (!confirm('Delete this photo?')) return;
+  await apiJson('DELETE', `/api/order-photos/${id}`);
+  orderPhotos = orderPhotos.filter(p => p.id !== id);
+  renderOrderPage();
+}
+
+// ── Gallery Upload ────────────────────────────────────────────────────────────
+function openUploadModal() {
+  selectedFiles.gallery = [];
+  document.getElementById('dz-gallery-preview').innerHTML = '';
+  document.getElementById('upload-caption').value = '';
+  document.getElementById('upload-err').style.display = 'none';
+  document.getElementById('upload-bar').style.display = 'none';
+  const sel = document.getElementById('upload-cat-select');
+  sel.innerHTML = categories.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  if (activeCat !== 'all') sel.value = activeCat;
   openModal('modal-upload');
 }
 
-function handleFileSelect(files) {
-  selectedFiles = Array.from(files);
-  const preview = document.getElementById('drop-zone-preview');
+function handleFiles(files, type) {
+  selectedFiles[type] = Array.from(files);
+  const previewId = type === 'gallery' ? 'dz-gallery-preview' : 'dz-order-preview';
+  const preview = document.getElementById(previewId);
   preview.innerHTML = '';
-  selectedFiles.forEach(f => {
-    const url = URL.createObjectURL(f);
+  selectedFiles[type].forEach(f => {
     const img = document.createElement('img');
-    img.src = url;
+    img.src = URL.createObjectURL(f);
     preview.appendChild(img);
   });
 }
 
-async function submitUpload() {
-  const errEl = document.getElementById('upload-error');
-  errEl.style.display = 'none';
-  if (!selectedFiles.length) { errEl.textContent = 'Please select at least one image.'; errEl.style.display = ''; return; }
-
-  const catId = document.getElementById('upload-category-select').value;
+async function doUploadGallery() {
+  const errEl = document.getElementById('upload-err');
+  if (!selectedFiles.gallery.length) { errEl.textContent = 'Select at least one image.'; errEl.style.display = ''; return; }
+  const catId = document.getElementById('upload-cat-select').value;
   const caption = document.getElementById('upload-caption').value.trim();
-  const submitBtn = document.getElementById('upload-submit-btn');
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Uploading...';
+  const btn = document.getElementById('upload-submit');
+  btn.disabled = true; btn.textContent = 'Uploading...';
+  const bar = document.getElementById('upload-bar'); bar.style.display = '';
+  const fill = document.getElementById('upload-bar-fill');
+  let done = 0; const newImgs = [];
 
-  const progressWrap = document.getElementById('upload-progress');
-  const progressBar = document.getElementById('upload-progress-bar');
-  progressWrap.style.display = '';
-
-  let uploaded = 0;
-  const total = selectedFiles.length;
-  const newImages = [];
-
-  for (const file of selectedFiles) {
+  for (const file of selectedFiles.gallery) {
     const fd = new FormData();
     fd.append('image', file);
     fd.append('category_id', catId);
     if (caption) fd.append('caption', caption);
-
     try {
-      const res = await fetch('/api/images', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${adminToken}` },
-        body: fd,
-      });
+      const res = await fetch('/api/images', { method: 'POST', headers: { Authorization: `Bearer ${adminToken}` }, body: fd });
       const data = await res.json();
-      if (data.error) throw new Error(data.error);
-      newImages.push(data);
-    } catch (e) {
-      errEl.textContent = `Failed to upload ${file.name}: ${e.message}`;
-      errEl.style.display = '';
-    }
-
-    uploaded++;
-    progressBar.style.width = `${Math.round((uploaded / total) * 100)}%`;
+      if (!data.error) newImgs.push(data);
+    } catch(e) { errEl.textContent = `Failed: ${file.name}`; errEl.style.display = ''; }
+    done++;
+    fill.style.width = `${Math.round(done / selectedFiles.gallery.length * 100)}%`;
   }
 
-  allImages = [...newImages, ...allImages];
+  allImages = [...newImgs, ...allImages];
   closeModal('modal-upload');
-  selectTab(Number(catId));
-
-  submitBtn.disabled = false;
-  submitBtn.textContent = 'Upload';
+  selectCat(Number(catId));
+  btn.disabled = false; btn.textContent = 'Upload';
 }
 
-// ── Delete Image ──────────────────────────────────────────────────────────────
-async function deleteImage(id) {
-  if (!confirm('Delete this image? This can\'t be undone.')) return;
-  await api('DELETE', `/api/images/${id}`);
+// ── Delete Gallery Image ──────────────────────────────────────────────────────
+async function delImage(id) {
+  if (!confirm('Delete this image?')) return;
+  await apiJson('DELETE', `/api/images/${id}`);
   allImages = allImages.filter(i => i.id !== id);
   renderGallery();
 }
 
-// ── Modal helpers ─────────────────────────────────────────────────────────────
-function openModal(id) {
-  document.getElementById(id).classList.add('open');
-}
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
+// ── Categories CRUD ───────────────────────────────────────────────────────────
+function openAddCatModal() {
+  document.getElementById('cat-name').value = '';
+  document.getElementById('cat-err').style.display = 'none';
+  selectedColor = COLORS[0].hex;
+  buildColorSwatches();
+  openModal('modal-add-cat');
+  setTimeout(() => document.getElementById('cat-name').focus(), 100);
 }
 
-// Close modals on backdrop click
-document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
-  backdrop.addEventListener('click', e => {
-    if (e.target === backdrop) backdrop.classList.remove('open');
+function buildColorSwatches() {
+  const c = document.getElementById('color-swatches');
+  if (!c) return;
+  c.innerHTML = '';
+  COLORS.forEach(col => {
+    const sw = document.createElement('div');
+    sw.className = 'color-swatch' + (col.hex === selectedColor ? ' selected' : '');
+    sw.style.background = col.hex;
+    sw.title = col.name;
+    sw.onclick = () => {
+      selectedColor = col.hex;
+      c.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+      sw.classList.add('selected');
+    };
+    c.appendChild(sw);
   });
+}
+
+async function doAddCat() {
+  const name = document.getElementById('cat-name').value.trim();
+  const errEl = document.getElementById('cat-err');
+  if (!name) { errEl.textContent = 'Name required.'; errEl.style.display = ''; return; }
+  const res = await apiJson('POST', '/api/categories', { name, color: selectedColor });
+  if (res.error) { errEl.textContent = res.error; errEl.style.display = ''; return; }
+  categories.push(res);
+  closeModal('modal-add-cat');
+  renderTabs();
+}
+
+async function delCat(id, name) {
+  if (!confirm(`Delete "${name}" and all its images?`)) return;
+  await apiJson('DELETE', `/api/categories/${id}`);
+  categories = categories.filter(c => c.id !== id);
+  allImages = allImages.filter(i => i.category_id !== id);
+  if (activeCat === id) activeCat = 'all';
+  renderTabs(); renderGallery();
+}
+
+// ── Admin Auth ────────────────────────────────────────────────────────────────
+function handleAdminLock() {
+  if (adminToken) {
+    document.getElementById('admin-login-panel').style.display = 'none';
+    document.getElementById('admin-logout-panel').style.display = '';
+  } else {
+    document.getElementById('admin-login-panel').style.display = '';
+    document.getElementById('admin-logout-panel').style.display = 'none';
+  }
+  openModal('modal-admin');
+  if (!adminToken) setTimeout(() => document.getElementById('admin-pw').focus(), 100);
+}
+
+async function doAdminLogin() {
+  const pw = document.getElementById('admin-pw').value;
+  const errEl = document.getElementById('admin-err');
+  errEl.style.display = 'none';
+  if (!pw) return;
+  const res = await fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pw }) });
+  const data = await res.json();
+  if (data.error) { errEl.style.display = ''; document.getElementById('admin-pw').value = ''; return; }
+  adminToken = data.token;
+  localStorage.setItem('lily_admin_token', adminToken);
+  document.body.classList.add('admin-mode');
+  closeModal('modal-admin');
+  document.getElementById('admin-pw').value = '';
+  // Show FAB if on gallery
+  if (currentPage === 'gallery') document.getElementById('upload-fab').style.display = 'flex';
+}
+
+async function doAdminLogout() {
+  await fetch('/api/admin/logout', { method: 'POST', headers: { Authorization: `Bearer ${adminToken}` } }).catch(() => {});
+  adminToken = null;
+  localStorage.removeItem('lily_admin_token');
+  document.body.classList.remove('admin-mode');
+  document.getElementById('upload-fab').style.display = 'none';
+  closeModal('modal-admin');
+  renderGallery();
+}
+
+// ── API helpers ───────────────────────────────────────────────────────────────
+async function apiJson(method, url, body) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (adminToken) opts.headers['Authorization'] = `Bearer ${adminToken}`;
+  if (body) opts.body = JSON.stringify(body);
+  return fetch(url, opts).then(r => r.json());
+}
+async function apiPost(url, body) { return apiJson('POST', url, body); }
+
+// ── Modal helpers ─────────────────────────────────────────────────────────────
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-backdrop').forEach(bd => {
+  bd.addEventListener('click', e => { if (e.target === bd) bd.classList.remove('open'); });
 });
 
 // ── Utils ─────────────────────────────────────────────────────────────────────
-function escHtml(str) {
+function esc(str) {
   if (!str) return '';
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 </script>
-
 </body>
 </html>
